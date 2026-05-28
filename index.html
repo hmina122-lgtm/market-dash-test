@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang='ko'>
+<html lang="ko">
 <head>
-<meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>한국 주식시장 AI 대시보드 | 2026년 5월 28일 (목)</title>
-<script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif; background: #f0f3f8; color: #1a1a2e; font-size: 14px; }
@@ -37,8 +38,6 @@
   .mw-pill { font-size: 10px; padding: 2px 8px; border-radius: 99px; border: 0.5px solid #d1d5db; color: #666; background: #fff; }
   .mw-update { font-size: 11px; color: #888; }
   .mw-orange-line { height: 3px; background: #F58220; }
-  .data-basis-bar { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 8px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; font-size: 11px; color: #92400e; }
-  .data-basis-bar strong { font-weight: 700; }
   .result-banner { background: linear-gradient(135deg, #043B72 0%, #1d5fa8 100%); border-radius: 12px; padding: 14px 20px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(4,59,114,0.2); }
   .result-banner h3 { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 10px; }
   .result-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -63,7 +62,7 @@
   .metric-sub { font-size: 12px; margin-top: 3px; }
   .card { background: #fff; border-radius: 12px; padding: 16px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
   .card-title { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .up { color: #dc2626; } .down { color: #2563eb; } .neutral { color: #888; } .warnc { color: #d97706; }
+  .up { color: #dc2626; } .down { color: #2563eb; } .neutral { color: #888; } .warn { color: #d97706; }
   .badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 600; }
   .badge-up { background: #fee2e2; color: #b91c1c; }
   .badge-warn { background: #fef3c7; color: #92400e; }
@@ -131,150 +130,193 @@
 </style>
 </head>
 <body>
-<div class='container'>
-  <div class='mw-top'>
-    <div style='display:flex;align-items:center;gap:8px;'>
-      <div class='mw-logo-box'><span class='mw-logo-text'>MIRAE ASSET</span></div>
-      <span class='mw-logo-sub'>Market Intelligence</span>
+<div class="container">
+
+  <div class="mw-top">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="mw-logo-box"><span class="mw-logo-text">MIRAE ASSET</span></div>
+      <span class="mw-logo-sub">Market Intelligence</span>
     </div>
-    <div class='mw-date-area'>
-      <span class='mw-date'>2026년 5월 28일 (목)</span>
-      <span class='mw-live'>● AI 생성</span>
+    <div class="mw-date-area">
+      <span class="mw-date">2026년 5월 28일 (목)</span>
+      <span class="mw-live">● AI 생성</span>
     </div>
   </div>
-  <div class='mw-main'>
-    <div class='mw-header-bar'>
+
+  <div class="mw-main">
+    <div class="mw-header-bar">
       <div>
-        <div class='mw-title-en'>Korea Equity Market AI Dashboard</div>
-        <div class='mw-title-ko'>한국 주식시장 <em>AI</em> 대시보드</div>
-        <div class='mw-title-desc'>전일 미국 증시 · 야간선물 · 환율 · 주요 경제 뉴스 종합 분석</div>
+        <div class="mw-title-en">Korea Equity Market AI Dashboard</div>
+        <div class="mw-title-ko">한국 주식시장 <em>AI</em> 대시보드</div>
+        <div class="mw-title-desc">전일 미국 증시 · 야간선물 · 환율 · 주요 경제 뉴스 종합 분석</div>
       </div>
-      <div class='mw-header-right'>
-        <div class='mw-sentiment-chip'>
-          <div class='mw-s-dot'></div>
-          <span class='mw-s-label'>오늘 장세 전망</span>
-          <span class='mw-s-val'>—</span>
+      <div class="mw-header-right">
+        <div class="mw-sentiment-chip">
+          <div class="mw-s-dot"></div>
+          <span class="mw-s-label">오늘 센티먼트</span>
+          <span class="mw-s-val">강세</span>
         </div>
-        <div class='mw-kpi-row'>
-          <div class='mw-kpi'><div class='mw-kpi-val'>—</div><div class='mw-kpi-label'>코스피 전일종가(5/27 (수))</div></div>
-          <div class='mw-kpi-div'></div>
-          <div class='mw-kpi'><div class='mw-kpi-val'>—</div><div class='mw-kpi-label'>전일 등락률</div></div>
-          <div class='mw-kpi-div'></div>
-          <div class='mw-kpi'><div class='mw-kpi-val'>—</div><div class='mw-kpi-label'>코스닥 전일종가</div></div>
+        <div class="mw-kpi-row">
+          <div class="mw-kpi"><div class="mw-kpi-val">—</div><div class="mw-kpi-label">코스피 전일(5/27 수)</div></div>
+          <div class="mw-kpi-div"></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">—</div><div class="mw-kpi-label">전일 등락</div></div>
+          <div class="mw-kpi-div"></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">—</div><div class="mw-kpi-label">코스닥 전일</div></div>
         </div>
       </div>
     </div>
-    <div class='mw-bottom-bar'>
-      <div class='mw-sources'>
-        <span class='mw-src-label'>데이터 소스</span>
-        <span class='mw-pill'>KRX</span><span class='mw-pill'>Bloomberg</span><span class='mw-pill'>Reuters</span><span class='mw-pill'>뉴스 검색</span><span class='mw-pill'>야간선물</span>
+    <div class="mw-bottom-bar">
+      <div class="mw-sources">
+        <span class="mw-src-label">데이터 소스</span>
+        <span class="mw-pill">KRX</span><span class="mw-pill">Bloomberg</span><span class="mw-pill">Reuters</span><span class="mw-pill">뉴스 검색</span><span class="mw-pill">야간선물</span>
       </div>
-      <span class='mw-update'>AI 생성: 2026년 5월 28일 15:21 KST | 데이터 기준: 2026년 5월 27일 (수) 확정 종가</span>
+      <span class="mw-update">AI 생성: 2026년 5월 28일 15:43 KST | 기준: 2026년 5월 27일 (수) 확정종가</span>
     </div>
-    <div class='mw-orange-line'></div>
+    <div class="mw-orange-line"></div>
   </div>
-  <div class='data-basis-bar'>
-    📌 <strong>데이터 기준:</strong> 2026년 5월 27일 (수) 확정 종가 기준 &nbsp;|&nbsp; 생성 시각: 2026년 5월 28일 15:21 KST &nbsp;|&nbsp; 오늘(2026년 5월 28일 (목)) 장세 전망 분석
-  </div>
-  <div class='result-banner'>
-    <h3>📌 전 거래일 실제 마감 결과</h3>
-    <div class='result-grid'>
-      <div class='result-item'><div class='result-label'>코스피 종가 (5/27 (수))</div><div class='result-val'>—</div><div class='result-chg'>▲ — (—)</div></div>
-      <div class='result-item'><div class='result-label'>S&amp;P 500 (5/27 (수))</div><div class='result-val'>—</div><div class='result-chg'>— (—)</div></div>
-      <div class='result-item'><div class='result-label'>나스닥</div><div class='result-val'>—</div><div class='result-chg'>— (—)</div></div>
-      <div class='result-item'><div class='result-label'>다우존스</div><div class='result-val'>—</div><div class='result-chg'>— (—)</div></div>
+
+  <div class="result-banner">
+    <h3>📌 전 거래일(5/27 수) 실제 마감 결과</h3>
+    <div class="result-grid">
+      <div class="result-item"><div class="result-label">코스피 종가</div><div class="result-val">8,447.69</div><div class="result-chg">▲ +400.18p (+4.96%)</div></div>
+      <div class="result-item"><div class="result-label">S&amp;P 500 (5/27 수)</div><div class="result-val">7,520.36</div><div class="result-chg">▲ +0.02%</div></div>
+      <div class="result-item"><div class="result-label">나스닥</div><div class="result-val">26,674.74</div><div class="result-chg">▲ +0.07%</div></div>
+      <div class="result-item"><div class="result-label">다우존스</div><div class="result-val">50,644.28</div><div class="result-chg">▲ +0.36%</div></div>
     </div>
   </div>
-  <div class='news-row'></div>
-  <div class='grid-4'>
-    <div class='metric-card'><div class='metric-label'>코스피 확정 종가 (5/27 (수))</div><div class='metric-value up'>—</div><div class='metric-sub up'> ()</div></div>
-    <div class='metric-card'><div class='metric-label'>코스닥 확정 종가 (5/27 (수))</div><div class='metric-value up'>—</div><div class='metric-sub up'> ()</div></div>
-    <div class='metric-card'><div class='metric-label'>오늘 장세 전망</div><div class='metric-value warnc'>—</div><div class='metric-sub warnc'></div></div>
-    <div class='metric-card'><div class='metric-label'>원/달러 환율 (5/27 (수))</div><div class='metric-value up'>—</div><div class='metric-sub up'>전일 확정 환율</div></div>
+
+  <div class="news-row"></div>
+
+  <div class="grid-4">
+    <div class="metric-card"><div class="metric-label">코스피 전일 종가 (5/27 수)</div><div class="metric-value up">8,447.69</div><div class="metric-sub up">▲ +400.18p (+4.96%)</div></div>
+    <div class="metric-card"><div class="metric-label">코스닥 전일 종가</div><div class="metric-value up">1,163.75</div><div class="metric-sub up">▼ -9.10p (-0.75%)</div></div>
+    <div class="metric-card"><div class="metric-label">오늘 시장 센티먼트</div><div class="metric-value warn">강세</div><div class="metric-sub warn">코스피 사상 최고치 경신, 반도체주 랠리, 미·이란 협상 기대감</div></div>
+    <div class="metric-card"><div class="metric-label">원/달러 환율 (5/27 수)</div><div class="metric-value up">1,400원</div><div class="metric-sub up">전일 확정 환율</div></div>
   </div>
-  <div class='grid-2'>
-    <div class='card'>
-      <div class='card-title'>📊 코스피 오늘 방향성 전망 <span class='badge badge-warn'></span></div>
-      <div class='gauge-wrap'>
-        <div class='gauge-bar-outer'>
-          <div class='gauge-up-fill' style='width:55%;background:linear-gradient(90deg,#fca5a5,#dc2626);'><span class='gauge-bar-label'>55%</span></div>
-          <div class='gauge-down-fill' style='background:linear-gradient(90deg,#93c5fd,#2563eb);'><span class='gauge-bar-label'>45%</span></div>
-          <div class='gauge-center-line'></div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📊 코스피 상승/하락 확률 <span class="badge badge-warn"></span></div>
+      <div class="gauge-wrap">
+        <div class="gauge-bar-outer">
+          <div class="gauge-up-fill" style="width:58%;background:linear-gradient(90deg,#fca5a5,#dc2626);"><span class="gauge-bar-label">58%</span></div>
+          <div class="gauge-down-fill" style="background:linear-gradient(90deg,#93c5fd,#2563eb);"><span class="gauge-bar-label">42%</span></div>
+          <div class="gauge-center-line"></div>
         </div>
-        <div class='gauge-labels'><span class='gauge-label-up'>▲ 상승 55%</span><span class='gauge-label-center'>50%</span><span class='gauge-label-down'>하락 45% ▼</span></div>
+        <div class="gauge-labels"><span class="gauge-label-up">▲ 상승 58%</span><span class="gauge-label-center">50%</span><span class="gauge-label-down">하락 42% ▼</span></div>
       </div>
-      <div class='prob-divider'>— 시나리오별 확률 —</div>
-      <div class="prob-row"><span class="prob-name up">추가 상승</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:55%;background:linear-gradient(90deg,#ef4444,#dc2626);"><span style="font-size:10px;font-weight:700;color:#fff;">55%</span></div></div><span class="prob-pct up">55%</span></div><div class="prob-row"><span class="prob-name neutral">횡보</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:15%;background:#9ca3af;"><span style="font-size:10px;font-weight:700;color:#fff;">15%</span></div></div><span class="prob-pct neutral">15%</span></div><div class="prob-row"><span class="prob-name down">하락</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:30%;background:linear-gradient(90deg,#3b82f6,#2563eb);"><span style="font-size:10px;font-weight:700;color:#fff;">30%</span></div></div><span class="prob-pct down">30%</span></div>
+      <div class="prob-divider">— 시나리오별 확률 —</div>
+      <div class="prob-row"><span class="prob-name up">추가 상승</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:58%;background:linear-gradient(90deg,#ef4444,#dc2626);"><span style="font-size:10px;font-weight:700;color:#fff;">58%</span></div></div><span class="prob-pct up">58%</span></div>
+      <div class="prob-row"><span class="prob-name neutral">횡보</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:16%;background:#9ca3af;"><span style="font-size:10px;font-weight:700;color:#fff;">16%</span></div></div><span class="prob-pct neutral">16%</span></div>
+      <div class="prob-row"><span class="prob-name down">차익 하락</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:26%;background:linear-gradient(90deg,#3b82f6,#2563eb);"><span style="font-size:10px;font-weight:700;color:#fff;">26%</span></div></div><span class="prob-pct down">26%</span></div>
     </div>
-    <div class='card'>
-      <div class='card-title'>📊 코스닥 오늘 방향성 전망 <span class='badge badge-green'></span></div>
-      <div class='gauge-wrap'>
-        <div class='gauge-bar-outer'>
-          <div class='gauge-up-fill' style='width:58%;background:linear-gradient(90deg,#fca5a5,#dc2626);'><span class='gauge-bar-label'>58%</span></div>
-          <div class='gauge-down-fill' style='background:linear-gradient(90deg,#93c5fd,#2563eb);'><span class='gauge-bar-label'>42%</span></div>
-          <div class='gauge-center-line'></div>
+    <div class="card">
+      <div class="card-title">📊 코스닥 상승/하락 확률 <span class="badge badge-green"></span></div>
+      <div class="gauge-wrap">
+        <div class="gauge-bar-outer">
+          <div class="gauge-up-fill" style="width:63%;background:linear-gradient(90deg,#fca5a5,#dc2626);"><span class="gauge-bar-label">63%</span></div>
+          <div class="gauge-down-fill" style="background:linear-gradient(90deg,#93c5fd,#2563eb);"><span class="gauge-bar-label">37%</span></div>
+          <div class="gauge-center-line"></div>
         </div>
-        <div class='gauge-labels'><span class='gauge-label-up'>▲ 상승 58%</span><span class='gauge-label-center'>50%</span><span class='gauge-label-down'>하락 42% ▼</span></div>
+        <div class="gauge-labels"><span class="gauge-label-up">▲ 상승 63%</span><span class="gauge-label-center">50%</span><span class="gauge-label-down">하락 37% ▼</span></div>
       </div>
-      <div class='prob-divider'>— 시나리오별 확률 —</div>
-      <div class="prob-row"><span class="prob-name up">추가 상승</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:58%;background:linear-gradient(90deg,#ef4444,#dc2626);"><span style="font-size:10px;font-weight:700;color:#fff;">58%</span></div></div><span class="prob-pct up">58%</span></div><div class="prob-row"><span class="prob-name neutral">횡보</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:14%;background:#9ca3af;"><span style="font-size:10px;font-weight:700;color:#fff;">14%</span></div></div><span class="prob-pct neutral">14%</span></div><div class="prob-row"><span class="prob-name down">하락</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:28%;background:linear-gradient(90deg,#3b82f6,#2563eb);"><span style="font-size:10px;font-weight:700;color:#fff;">28%</span></div></div><span class="prob-pct down">28%</span></div>
+      <div class="prob-divider">— 시나리오별 확률 —</div>
+      <div class="prob-row"><span class="prob-name up">추가 상승</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:63%;background:linear-gradient(90deg,#ef4444,#dc2626);"><span style="font-size:10px;font-weight:700;color:#fff;">63%</span></div></div><span class="prob-pct up">63%</span></div>
+      <div class="prob-row"><span class="prob-name neutral">횡보</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:15%;background:#9ca3af;"><span style="font-size:10px;font-weight:700;color:#fff;">15%</span></div></div><span class="prob-pct neutral">15%</span></div>
+      <div class="prob-row"><span class="prob-name down">하락</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:22%;background:linear-gradient(90deg,#3b82f6,#2563eb);"><span style="font-size:10px;font-weight:700;color:#fff;">22%</span></div></div><span class="prob-pct down">22%</span></div>
     </div>
   </div>
-  <div class='grid-2'>
-    <div class='card'>
-      <div class='card-title'>📈 코스피 오늘 예상 범위 <span class='badge badge-warn'></span></div>
-      <div class='pred-band'><div class="pred-item pred-bear"><div class="pred-label">약세</div><div class="pred-range down">—</div><div class="pred-prob">—%</div></div><div class="pred-item pred-base"><div class="pred-label">기본</div><div class="pred-range">—</div><div class="pred-prob">—%</div></div><div class="pred-item pred-bull"><div class="pred-label">강세</div><div class="pred-range up">—</div><div class="pred-prob">—%</div></div></div>
-      <div class='chart-wrap'><canvas id='kospiChart'></canvas></div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📈 코스피 장중 예상 <span class="badge badge-warn"></span></div>
+      <div class="pred-band">
+        <div class="pred-item pred-bear"><div class="pred-label">약세</div><div class="pred-range down">—</div><div class="pred-prob">—%</div></div>
+        <div class="pred-item pred-base"><div class="pred-label">기본</div><div class="pred-range">—</div><div class="pred-prob">—%</div></div>
+        <div class="pred-item pred-bull"><div class="pred-label">강세</div><div class="pred-range up">—</div><div class="pred-prob">—%</div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="kospiChart"></canvas></div>
     </div>
-    <div class='card'>
-      <div class='card-title'>📈 코스닥 오늘 예상 범위 <span class='badge badge-green'></span></div>
-      <div class='pred-band'><div class="pred-item pred-bear"><div class="pred-label">약세</div><div class="pred-range down">—</div><div class="pred-prob">—%</div></div><div class="pred-item pred-base"><div class="pred-label">기본</div><div class="pred-range">—</div><div class="pred-prob">—%</div></div><div class="pred-item pred-bull"><div class="pred-label">강세</div><div class="pred-range up">—</div><div class="pred-prob">—%</div></div></div>
-      <div class='chart-wrap'><canvas id='kosdaqChart'></canvas></div>
+    <div class="card">
+      <div class="card-title">📈 코스닥 장중 예상 <span class="badge badge-green"></span></div>
+      <div class="pred-band">
+        <div class="pred-item pred-bear"><div class="pred-label">약세</div><div class="pred-range down">—</div><div class="pred-prob">—%</div></div>
+        <div class="pred-item pred-base"><div class="pred-label">기본</div><div class="pred-range">—</div><div class="pred-prob">—%</div></div>
+        <div class="pred-item pred-bull"><div class="pred-label">강세</div><div class="pred-range up">—</div><div class="pred-prob">—%</div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="kosdaqChart"></canvas></div>
     </div>
   </div>
-  <div class='grid-2'>
-    <div class='card'>
-      <div class='card-title'>🌍 전 거래일 미국 증시 &amp; 주요 지표 (5/27 (수))</div>
-      <div class='futures-grid'></div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🌍 전 거래일 미국 증시 &amp; 주요 지표 (5/27 수)</div>
+      <div class="futures-grid"></div>
     </div>
-    <div class='card'>
-      <div class='card-title'>📅 이번 주 주요 경제 일정</div>
+    <div class="card">
+      <div class="card-title">📅 이번 주 주요 경제 일정</div>
       
     </div>
   </div>
-  <div class='grid-2'>
-    <div class='card'>
-      <div class='card-title'>🏦 오늘 업종별 전망</div>
-      
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🏦 오늘 업종 예상</div>
+      <div id="sectorList"></div>
     </div>
-    <div class='card'>
-      <div class='card-title'>🧠 AI 종합 분석 <span style='font-size:10px;color:#999;font-weight:400;'>| 기준: 2026년 5월 27일 (수) 확정 종가</span></div>
-      <div class='analysis-text'>분석 데이터를 불러오는 중 오류가 발생했습니다.</div>
-      <div class='tags'></div>
-      <div class='notice'>⚠️ 본 분석은 2026년 5월 27일 (수) 확정 종가 기준으로 생성된 참고용 전망입니다. 실제 투자 판단의 근거로 사용하지 마세요.</div>
+    <div class="card">
+      <div class="card-title">🧠 AI 종합 분석</div>
+      <div class="analysis-text">분석 데이터를 불러오는 중 오류가 발생했습니다.</div>
+      <div class="tags"></div>
+      <div class="notice">⚠️ 본 분석은 2026년 5월 27일 (수) 확정 종가 기준으로 생성된 참고용 예상이며, 실제 투자 판단의 근거로 사용하지 마세요.</div>
     </div>
   </div>
-  <div class='footer'>MIRAE ASSET Market Intelligence · 한국 주식시장 AI 대시보드 · 2026년 5월 28일 (목) · 데이터 기준: 2026년 5월 27일 (수) · 참고용</div>
+
+  <div class="footer">MIRAE ASSET Market Intelligence · 한국 주식시장 AI 대시보드 · 2026년 5월 28일 (목) · 기준: 2026년 5월 27일 (수) · 참고용</div>
 </div>
+
 <script>
-const L=['9:00','9:30','10:00','10:30','11:00','11:30','12:00','13:00','13:30','14:00','14:30','15:00','15:30'];
-function makeChart(id,base,high,low,color){
-  new Chart(document.getElementById(id).getContext('2d'),{
+const labels = ['9:00','9:30','10:00','10:30','11:00','11:30','12:00','13:00','13:30','14:00','14:30','15:00','15:30'];
+const kospiBase  = [7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0];
+const kospiHigh  = [7847.0, 7854.85, 7862.69, 7870.54, 7878.39, 7886.23, 7894.08, 7901.93, 7909.78, 7917.62, 7925.47, 7933.32, 7941.16];
+const kospiLow   = [7847.0, 7839.15, 7831.31, 7823.46, 7815.61, 7807.77, 7799.92, 7792.07, 7784.22, 7776.38, 7768.53, 7760.68, 7752.84];
+const kosdaqBase = [856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0];
+const kosdaqHigh = [856.0, 856.86, 857.71, 858.57, 859.42, 860.28, 861.14, 861.99, 862.85, 863.7, 864.56, 865.42, 866.27];
+const kosdaqLow  = [856.0, 855.14, 854.29, 853.43, 852.58, 851.72, 850.86, 850.01, 849.15, 848.3, 847.44, 846.58, 845.73];
+
+function makeChart(id, base, high, low, color) {
+  new Chart(document.getElementById(id).getContext('2d'), {
     type:'line',
-    data:{labels:L,datasets:[
-      {label:'상단',data:high,borderColor:color,borderWidth:1,borderDash:[4,3],fill:false,tension:.4,pointRadius:0},
-      {label:'기본',data:base,borderColor:color,borderWidth:2.5,fill:false,tension:.4,pointRadius:3,pointBackgroundColor:color},
-      {label:'하단',data:low,borderColor:color,borderWidth:1,borderDash:[4,3],fill:'-1',backgroundColor:color+'14',tension:.4,pointRadius:0}
+    data:{ labels, datasets:[
+      {label:'상단',data:high,borderColor:color,borderWidth:1,borderDash:[4,3],fill:false,tension:0.4,pointRadius:0},
+      {label:'기본',data:base,borderColor:color,borderWidth:2.5,fill:false,tension:0.4,pointRadius:3,pointBackgroundColor:color},
+      {label:'하단',data:low,borderColor:color,borderWidth:1,borderDash:[4,3],fill:'-1',backgroundColor:color+'14',tension:0.4,pointRadius:0}
     ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:10},maxRotation:0,maxTicksLimit:7}},
-               y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:10},callback:v=>v.toLocaleString()}}}
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toLocaleString()}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:10},maxRotation:0,maxTicksLimit:7}},
+        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},callback:v=>v.toLocaleString()}}
+      }
     }
   });
 }
-makeChart('kospiChart',[2650.0, 2650.0, 2650.0, 2650.0, 2650.0, 2650.0, 2650.0, 2650.0, 2650.0, 2650.0, 2650.0, 2650.0, 2650.0],[2650.0, 2652.65, 2655.3, 2657.95, 2660.6, 2663.25, 2665.9, 2668.55, 2671.2, 2673.85, 2676.5, 2679.15, 2681.8],[2650.0, 2647.35, 2644.7, 2642.05, 2639.4, 2636.75, 2634.1, 2631.45, 2628.8, 2626.15, 2623.5, 2620.85, 2618.2],'#dc2626');
-makeChart('kosdaqChart',[850.0, 850.0, 850.0, 850.0, 850.0, 850.0, 850.0, 850.0, 850.0, 850.0, 850.0, 850.0, 850.0],[850.0, 850.85, 851.7, 852.55, 853.4, 854.25, 855.1, 855.95, 856.8, 857.65, 858.5, 859.35, 860.2],[850.0, 849.15, 848.3, 847.45, 846.6, 845.75, 844.9, 844.05, 843.2, 842.35, 841.5, 840.65, 839.8],'#2563eb');
+makeChart('kospiChart',  kospiBase,  kospiHigh,  kospiLow,  '#dc2626');
+makeChart('kosdaqChart', kosdaqBase, kosdaqHigh, kosdaqLow, '#2563eb');
+
+const sectors = [];
+const maxAbs = Math.max(...sectors.map(s=>Math.abs(s.chg)));
+document.getElementById('sectorList').innerHTML = sectors.map(s=>{
+  const pct = Math.abs(s.chg)/maxAbs*100;
+  const col = s.chg>0?'#dc2626':'#2563eb';
+  const cls = s.chg>0?'up':'down';
+  return `<div class="sector-row">
+    <span class="sector-name">${s.name}</span>
+    <div class="sector-bar-bg"><div class="sector-bar" style="width:${pct.toFixed(0)}%;background:${col};"></div></div>
+    <span class="sector-pct ${cls}">${s.chg>0?'+':''}${s.chg.toFixed(1)}%</span>
+  </div>`;
+}).join('');
 </script>
 </body>
 </html>
