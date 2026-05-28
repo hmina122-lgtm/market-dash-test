@@ -113,7 +113,7 @@ def make_banner():
     if sp500_chg_pct: parts.append(f"S&P500 {sp500_chg_pct:+.2f}%")
     return f"전 거래일({PREV_SHORT}) 실제 마감 결과 — " + " · ".join(parts) if parts else f"전 거래일({PREV_SHORT}) 실제 마감 결과"
 
-time.sleep(65)
+time.sleep(90)
 
 # ── 2단계: 뉴스·일정 (웹검색 사용) ──
 print("📰 [2/3] 뉴스·일정 수집 중...")
@@ -127,8 +127,9 @@ r2 = safe_json(call_claude_search(
     '{"date":"날짜","today":false,"title":"이벤트","desc":"설명","imp":"med"},'
     '{"date":"날짜","today":false,"title":"이벤트","desc":"설명","imp":"high"}]}'
 ))
+print("  스케줄 수:" + str(len(r2.get('schedule',[]))))  # ← 이 줄 추가
 
-time.sleep(65)
+time.sleep(90)
 
 # ── 3단계: AI 분석 (웹검색 없음 - 안정적) ──
 print("🧠 [3/3] AI 분석 생성 중...")
