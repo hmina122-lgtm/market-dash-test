@@ -27,7 +27,7 @@ SYSTEM = f"""당신은 한국 주식시장 전문 애널리스트입니다.
 def call_claude(prompt: str) -> str:
     """Claude API 호출 (웹 검색 포함)"""
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-5",
         max_tokens=2000,
         system=SYSTEM,
         tools=[{"type": "web_search_20250305", "name": "web_search"}],
