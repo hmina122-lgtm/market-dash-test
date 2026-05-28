@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import anthropic, json, re, time
+import yfinance as yf
 from datetime import datetime, timezone, timedelta
 
 KST = timezone(timedelta(hours=9))
 now = datetime.now(KST)
 DAYS_KO = ['월','화','수','목','금','토','일']
-TODAY_TITLE = now.strftime("%Y년 %-m월 %-d일") + " (" + DAYS_KO[now.weekday()] + ")"
-TODAY_YMD   = now.strftime("%Y-%m-%d")
+TODAY_TITLE  = now.strftime("%Y년 %-m월 %-d일") + " (" + DAYS_KO[now.weekday()] + ")"
+TODAY_YMD    = now.strftime("%Y-%m-%d")
 GENERATED_AT = now.strftime("%Y년 %-m월 %-d일 %H:%M KST")
 
 def get_prev_trading_day(d):
@@ -38,45 +39,151 @@ def safe_json(text):
         except: pass
     return {}
 
-# ── 1차: 시장 지표 ──
-print("📡 [1/3] 시장 지표 수집 중...")
-r1 = safe_json(call_claude(
-    "오늘 " + TODAY_YMD + ", 전 거래일(" + PREV_FULL + ") 확정 종가를 웹검색으로 수집해 JSON만 반환:\n"
-    '{"kospi_close":"","kospi_chg":"▲ +Xp (+X%)","kosdaq_close":"","kosdaq_chg":"▲ +Xp (+X%)","usd_krw":"","sp500_close":"","sp500_chg":"▲ +Xp (+X%)","nasdaq_close":"","nasdaq_chg":"","dow_close":"","dow_chg":"","wti":"","us10y":"","kospi_kpi":"","kospi_chg_pct":"","kosdaq_kpi":"","banner_title":"전 거래일(' + PREV_SHORT + ') 실제 마감 결과 — 코스피 X% · S&P500 X주 연속 랠리"}'
-))
-print("  코스피: " + r1.get('kospi_close','—'))
+def fmt(v, decimals=2):
+    if v is None: return "—"
+    return f"{v:,.{decimals}f}"
+
+def chg_str(cur, prev):
+    if cur is None or prev is None: return "—"
+    diff = cur - prev
+    pct  = diff / prev * 100
+    sign = "▲" if diff >= 0 else "▼"
+    return f"{sign} {diff:+.2f}p ({pct:+.2f}%)"
+
+# ── 1단계: yfinance로 정확한 종가 수집 ──
+print("📡 [1/3] yfinance 정확한 종가 수집 중...")
+
+tickers = {
+    "kospi":  "^KS11",
+    "kosdaq": "^KQ11",
+    "sp500":  "^GSPC",
+    "nasdaq": "^IXIC",
+    "dow":    "^DJI",
+    "usd_krw":"KRW=X",
+    "wti":    "CL=F",
+    "us10y":  "^TNX",
+}
+
+mkt = {}
+for key, symbol in tickers.items():
+    try:
+        tk   = yf.Ticker(symbol)
+        hist = tk.history(period="5d")
+        if len(hist) >= 2:
+            mkt[key + "_close"] = round(hist["Close"].iloc[-1], 2)
+            mkt[key + "_prev"]  = round(hist["Close"].iloc[-2], 2)
+        elif len(hist) == 1:
+            mkt[key + "_close"] = round(hist["Close"].iloc[-1], 2)
+            mkt[key + "_prev"]  = None
+    except Exception as e:
+        print(f"  {key} 오류: {e}")
+
+# 등락 계산
+kospi_close  = mkt.get("kospi_close");  kospi_prev  = mkt.get("kospi_prev")
+kosdaq_close = mkt.get("kosdaq_close"); kosdaq_prev = mkt.get("kosdaq_prev")
+sp500_close  = mkt.get("sp500_close");  sp500_prev  = mkt.get("sp500_prev")
+nasdaq_close = mkt.get("nasdaq_close"); nasdaq_prev = mkt.get("nasdaq_prev")
+dow_close    = mkt.get("dow_close");    dow_prev    = mkt.get("dow_prev")
+usd_krw      = mkt.get("usd_krw_close")
+wti          = mkt.get("wti_close")
+us10y        = mkt.get("us10y_close")
+
+kospi_chg_pt  = round(kospi_close  - kospi_prev,  2) if kospi_close  and kospi_prev  else None
+kosdaq_chg_pt = round(kosdaq_close - kosdaq_prev, 2) if kosdaq_close and kosdaq_prev else None
+sp500_chg_pt  = round(sp500_close  - sp500_prev,  2) if sp500_close  and sp500_prev  else None
+nasdaq_chg_pt = round(nasdaq_close - nasdaq_prev, 2) if nasdaq_close and nasdaq_prev else None
+dow_chg_pt    = round(dow_close    - dow_prev,    2) if dow_close    and dow_prev    else None
+
+def pct(cur, prev):
+    if cur and prev: return round((cur-prev)/prev*100, 2)
+    return None
+
+kospi_chg_pct  = pct(kospi_close,  kospi_prev)
+kosdaq_chg_pct = pct(kosdaq_close, kosdaq_prev)
+sp500_chg_pct  = pct(sp500_close,  sp500_prev)
+nasdaq_chg_pct = pct(nasdaq_close, nasdaq_prev)
+dow_chg_pct    = pct(dow_close,    dow_prev)
+
+def chg_display(pt, pc):
+    if pt is None or pc is None: return "—"
+    sign = "▲" if pt >= 0 else "▼"
+    return f"{sign} {pt:+.2f}p ({pc:+.2f}%)"
+
+print(f"  코스피: {fmt(kospi_close)} ({chg_display(kospi_chg_pt, kospi_chg_pct)})")
+print(f"  S&P500: {fmt(sp500_close)}")
+
+# banner_title 생성
+def make_banner():
+    parts = []
+    if kospi_chg_pct is not None:
+        parts.append(f"코스피 {kospi_chg_pct:+.2f}%")
+    if sp500_chg_pct is not None:
+        parts.append(f"S&P500 {sp500_chg_pct:+.2f}%")
+    return f"전 거래일({PREV_SHORT}) 실제 마감 결과 — " + " · ".join(parts) if parts else f"전 거래일({PREV_SHORT}) 실제 마감 결과"
+
 time.sleep(65)
 
-# ── 2차: 뉴스 + 일정 + 미국증시 ──
+# ── 2단계: 뉴스 + 일정 + 미국증시 코멘트 ──
 print("📰 [2/3] 뉴스·일정 수집 중...")
 r2 = safe_json(call_claude(
-    "오늘 " + TODAY_YMD + ", 한국증시 관련 최신 뉴스와 이번주 경제일정을 웹검색으로 수집해 JSON만 반환:\n"
-    '{"news":[{"type":"bull","tag":"🇺🇸 미국 증시 (' + PREV_SHORT + ')","title":"헤드라인","desc":"2-3문장 요약"},{"type":"warn","tag":"📅 이번주 핵심 이벤트","title":"헤드라인","desc":"2-3문장 요약"},{"type":"neutral","tag":"⚠️ 주요 리스크","title":"헤드라인","desc":"2-3문장 요약"}],'
-    '"us_market":[{"name":"S&P 500","val":"","chg":"","cls":"up"},{"name":"나스닥","val":"","chg":"","cls":"up"},{"name":"다우존스","val":"","chg":"","cls":"up"},{"name":"필라델피아 반도체","val":"","chg":"","cls":"up"},{"name":"WTI 유가","val":"","chg":"","cls":"down"},{"name":"미 10년물 금리","val":"","chg":"","cls":"neutral"},{"name":"원/달러 (예상)","val":"","chg":"","cls":"up"},{"name":"코스피200 야간선물","val":"","chg":"","cls":"neutral"}],'
-    '"schedule":[{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"high"},{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"med"},{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"high"}]}'
+    "오늘 " + TODAY_YMD + ", 한국 증시 관련 최신 뉴스와 이번주 경제일정을 웹검색으로 수집해 JSON만 반환:\n"
+    '{"news":[{"type":"bull","tag":"🇺🇸 미국 증시 (' + PREV_SHORT + ')","title":"헤드라인","desc":"2-3문장 요약"},'
+    '{"type":"warn","tag":"📅 이번주 핵심 이벤트","title":"헤드라인","desc":"2-3문장 요약"},'
+    '{"type":"neutral","tag":"⚠️ 주요 리스크","title":"헤드라인","desc":"2-3문장 요약"}],'
+    '"us_market_comments":{'
+    '"sp500":"S&P500 코멘트(예: 8주 연속↑)","nasdaq":"나스닥 코멘트","dow":"다우 코멘트(예: 사상최고치)",'
+    '"semicon":"필라델피아반도체 코멘트","wti":"WTI 코멘트","us10y":"금리 코멘트","usd_krw":"환율 코멘트","kospi200f":"코스피200 야간선물 코멘트"},'
+    '"schedule":[{"date":"날짜(예:5/28)","today":false,"title":"이벤트명","desc":"설명","imp":"high"},'
+    '{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"med"},'
+    '{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"high"}]}'
 ))
 time.sleep(65)
 
-# ── 3차: 분석 + 업종 + 확률 ──
+# ── 3단계: AI 분석 + 업종 + 확률 ──
 print("🧠 [3/3] AI 분석 생성 중...")
 r3 = safe_json(call_claude(
-    "오늘 " + TODAY_YMD + ", 코스피=" + str(r1.get('kospi_close','')) + ", S&P500=" + str(r1.get('sp500_close','')) + "\n"
-    "전일 데이터 기반으로 오늘 한국 증시 전망을 JSON만 반환:\n"
-    '{"sentiment":"중립~소폭 강세","sentiment_reason":"전망 근거 한줄","kospi_up":58,"kospi_neutral":16,"kosdaq_up":63,"kosdaq_neutral":15,"kospi_badge":"핵심키워드","kosdaq_badge":"핵심키워드",'
+    "오늘 " + TODAY_YMD + ", 코스피=" + str(kospi_close) + "(" + str(kospi_chg_pct) + "%), S&P500=" + str(sp500_close) + "\n"
+    "전일 확정 데이터 기반으로 오늘 한국 증시 전망을 JSON만 반환:\n"
+    '{"sentiment":"중립~소폭 강세","sentiment_reason":"전망 근거 한줄",'
+    '"kospi_up":58,"kospi_neutral":16,"kosdaq_up":63,"kosdaq_neutral":15,'
+    '"kospi_badge":"핵심키워드","kosdaq_badge":"핵심키워드",'
     '"kospi_bear":"범위","kospi_bear_prob":30,"kospi_base":"범위","kospi_base_prob":52,"kospi_bull":"범위","kospi_bull_prob":18,'
     '"kosdaq_bear":"범위","kosdaq_bear_prob":25,"kosdaq_base":"범위","kosdaq_base_prob":55,"kosdaq_bull":"범위","kosdaq_bull_prob":20,'
-    '"kospi_base_price":7847,"kosdaq_base_price":856,'
-    '"sectors":[{"name":"반도체","chg":1.5,"note":"이유"},{"name":"2차전지","chg":0.8,"note":"이유"},{"name":"바이오·제약","chg":0.5,"note":"이유"},{"name":"항공·여행","chg":0.3,"note":"이유"},{"name":"금융","chg":-0.2,"note":"이유"},{"name":"건설·부동산","chg":-0.5,"note":"이유"},{"name":"유틸리티","chg":-0.8,"note":"이유"}],'
+    '"kospi_base_price":' + str(int(kospi_close) if kospi_close else 7847) + ','
+    '"kosdaq_base_price":' + str(int(kosdaq_close) if kosdaq_close else 856) + ','
+    '"sectors":[{"name":"반도체","chg":1.5,"note":"이유"},{"name":"2차전지","chg":0.8,"note":"이유"},'
+    '{"name":"바이오·제약","chg":0.5,"note":"이유"},{"name":"항공·여행","chg":0.3,"note":"이유"},'
+    '{"name":"금융","chg":-0.2,"note":"이유"},{"name":"건설·부동산","chg":-0.5,"note":"이유"},{"name":"유틸리티","chg":-0.8,"note":"이유"}],'
     '"analysis":"오늘 장세 종합 분석 2-3문단 HTML strong 태그 사용",'
-    '"tags":[{"type":"bull","text":"키워드"},{"type":"bull","text":"키워드"},{"type":"warn","text":"키워드"},{"type":"bear","text":"키워드"},{"type":"neutral","text":"키워드"},{"type":"purple","text":"키워드"}]}'
+    '"tags":[{"type":"bull","text":"키워드"},{"type":"bull","text":"키워드"},{"type":"warn","text":"키워드"},'
+    '{"type":"bear","text":"키워드"},{"type":"neutral","text":"키워드"},{"type":"purple","text":"키워드"}]}'
 ))
 print("  센티먼트: " + r3.get('sentiment','—'))
 
-# ── 데이터 합치기 ──
+# ── 미국 증시 카드 데이터 조합 (yfinance 수치 + Claude 코멘트) ──
+cmts = r2.get('us_market_comments', {})
+sp500_cls  = "up" if sp500_chg_pt  and sp500_chg_pt  >= 0 else "down"
+nasdaq_cls = "up" if nasdaq_chg_pt and nasdaq_chg_pt >= 0 else "down"
+dow_cls    = "up" if dow_chg_pt    and dow_chg_pt    >= 0 else "down"
+us_market = [
+    {"name":"S&P 500",        "val":fmt(sp500_close),  "chg":(f"{sp500_chg_pct:+.2f}% · " if sp500_chg_pct else "") + cmts.get("sp500",""),  "cls":sp500_cls},
+    {"name":"나스닥",          "val":fmt(nasdaq_close), "chg":(f"{nasdaq_chg_pct:+.2f}% · " if nasdaq_chg_pct else "") + cmts.get("nasdaq",""), "cls":nasdaq_cls},
+    {"name":"다우존스",        "val":fmt(dow_close),    "chg":(f"{dow_chg_pct:+.2f}% · " if dow_chg_pct else "") + cmts.get("dow",""),    "cls":dow_cls},
+    {"name":"필라델피아 반도체","val":"—",               "chg":cmts.get("semicon",""),  "cls":"up"},
+    {"name":"WTI 유가",        "val":f"${fmt(wti)}",    "chg":cmts.get("wti",""),      "cls":"neutral"},
+    {"name":"미 10년물 금리",  "val":f"{fmt(us10y)}%",  "chg":cmts.get("us10y",""),    "cls":"neutral"},
+    {"name":"원/달러 환율",    "val":f"{fmt(usd_krw, 0)}원", "chg":cmts.get("usd_krw",""), "cls":"up"},
+    {"name":"코스피200 야간선물","val":"—",              "chg":cmts.get("kospi200f",""),"cls":"neutral"},
+]
+
 d = {}
-d.update(r1)
 d.update(r2)
 d.update(r3)
+d['us_market']   = us_market
+d['banner_title'] = make_banner()
+
+k_up  = d.get('kospi_up',58);  k_n  = d.get('kospi_neutral',16)
+kd_up = d.get('kosdaq_up',63); kd_n = d.get('kosdaq_neutral',15)
 
 # ── 헬퍼 ──
 def news_html(lst):
@@ -125,11 +232,8 @@ def gen_chart(base, bear_str, bull_str):
     ba = [(h+l)/2 for h,l in zip(hi,lo)]
     return ba, hi, lo
 
-kb,  kh,  kl  = gen_chart(d.get('kospi_base_price',7847),  d.get('kospi_bear',''),  d.get('kospi_bull',''))
-kdb, kdh, kdl = gen_chart(d.get('kosdaq_base_price',856), d.get('kosdaq_bear',''), d.get('kosdaq_bull',''))
-
-k_up  = d.get('kospi_up',58);  k_n  = d.get('kospi_neutral',16)
-kd_up = d.get('kosdaq_up',63); kd_n = d.get('kosdaq_neutral',15)
+kb,  kh,  kl  = gen_chart(d.get('kospi_base_price', int(kospi_close) if kospi_close else 7847),  d.get('kospi_bear',''),  d.get('kospi_bull',''))
+kdb, kdh, kdl = gen_chart(d.get('kosdaq_base_price', int(kosdaq_close) if kosdaq_close else 856), d.get('kosdaq_bear',''), d.get('kosdaq_bull',''))
 
 HTML = """<!DOCTYPE html>
 <html lang="ko">
@@ -179,11 +283,9 @@ HTML = """<!DOCTYPE html>
   .result-chg { font-size: 11px; color: rgba(255,255,255,0.75); margin-top: 2px; }
   .news-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
   .news-item { background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 3px solid #2563eb; }
-  .news-item.bull { border-left-color: #dc2626; }
-  .news-item.warn { border-left-color: #d97706; }
+  .news-item.bull { border-left-color: #dc2626; } .news-item.warn { border-left-color: #d97706; }
   .news-tag { font-size: 10px; font-weight: 700; color: #2563eb; margin-bottom: 4px; }
-  .news-item.bull .news-tag { color: #dc2626; }
-  .news-item.warn .news-tag { color: #d97706; }
+  .news-item.bull .news-tag { color: #dc2626; } .news-item.warn .news-tag { color: #d97706; }
   .news-title { font-size: 12px; font-weight: 600; margin-bottom: 3px; line-height: 1.5; }
   .news-desc { font-size: 11px; color: #666; line-height: 1.5; }
   .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
@@ -196,10 +298,8 @@ HTML = """<!DOCTYPE html>
   .card-title { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .up { color: #dc2626; } .down { color: #2563eb; } .neutral { color: #888; } .warn { color: #d97706; }
   .badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 600; }
-  .badge-up { background: #fee2e2; color: #b91c1c; }
-  .badge-warn { background: #fef3c7; color: #92400e; }
-  .badge-blue { background: #dbeafe; color: #1d4ed8; }
-  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-up { background: #fee2e2; color: #b91c1c; } .badge-warn { background: #fef3c7; color: #92400e; }
+  .badge-blue { background: #dbeafe; color: #1d4ed8; } .badge-green { background: #d1fae5; color: #065f46; }
   .badge-msci { background: #ede9fe; color: #5b21b6; }
   .gauge-wrap { margin-bottom: 10px; }
   .gauge-bar-outer { width: 100%; height: 28px; border-radius: 14px; overflow: hidden; display: flex; position: relative; background: #e5e7eb; margin-bottom: 5px; }
@@ -240,15 +340,12 @@ HTML = """<!DOCTYPE html>
   .sch-title { font-size: 12px; font-weight: 600; }
   .sch-desc { font-size: 11px; color: #666; margin-top: 2px; }
   .sch-badge { font-size: 10px; padding: 1px 7px; border-radius: 99px; font-weight: 600; margin-left: 5px; }
-  .sch-high { background: #fee2e2; color: #b91c1c; }
-  .sch-med { background: #fef3c7; color: #92400e; }
+  .sch-high { background: #fee2e2; color: #b91c1c; } .sch-med { background: #fef3c7; color: #92400e; }
   .analysis-text { font-size: 13px; line-height: 1.8; color: #333; }
   .tags { margin-top: 10px; }
   .tag { display: inline-block; font-size: 11px; padding: 2px 9px; border-radius: 99px; margin: 2px 3px 2px 0; }
-  .tag-bull { background: #fee2e2; color: #b91c1c; }
-  .tag-bear { background: #dbeafe; color: #1d4ed8; }
-  .tag-neutral { background: #f3f4f6; color: #555; }
-  .tag-warn { background: #fef3c7; color: #92400e; }
+  .tag-bull { background: #fee2e2; color: #b91c1c; } .tag-bear { background: #dbeafe; color: #1d4ed8; }
+  .tag-neutral { background: #f3f4f6; color: #555; } .tag-warn { background: #fef3c7; color: #92400e; }
   .tag-purple { background: #ede9fe; color: #5b21b6; }
   .notice { font-size: 11px; color: #999; background: #f9fafb; border-radius: 8px; padding: 9px 12px; margin-top: 12px; border: 1px solid #e5e7eb; }
   .chart-wrap { position: relative; height: 165px; }
@@ -284,18 +381,18 @@ HTML = """<!DOCTYPE html>
           <span class="mw-s-val">""" + d.get('sentiment','—') + """</span>
         </div>
         <div class="mw-kpi-row">
-          <div class="mw-kpi"><div class="mw-kpi-val">""" + d.get('kospi_kpi', d.get('kospi_close','—')) + """</div><div class="mw-kpi-label">코스피 전일(""" + PREV_SHORT + """)</div></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">""" + fmt(kospi_close) + """</div><div class="mw-kpi-label">코스피 전일(""" + PREV_SHORT + """)</div></div>
           <div class="mw-kpi-div"></div>
-          <div class="mw-kpi"><div class="mw-kpi-val">""" + d.get('kospi_chg_pct','—') + """</div><div class="mw-kpi-label">전일 등락</div></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">""" + (f"{kospi_chg_pct:+.2f}%" if kospi_chg_pct else "—") + """</div><div class="mw-kpi-label">전일 등락</div></div>
           <div class="mw-kpi-div"></div>
-          <div class="mw-kpi"><div class="mw-kpi-val">""" + d.get('kosdaq_kpi', d.get('kosdaq_close','—')) + """</div><div class="mw-kpi-label">코스닥 전일</div></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">""" + fmt(kosdaq_close) + """</div><div class="mw-kpi-label">코스닥 전일</div></div>
         </div>
       </div>
     </div>
     <div class="mw-bottom-bar">
       <div class="mw-sources">
         <span class="mw-src-label">데이터 소스</span>
-        <span class="mw-pill">KRX</span><span class="mw-pill">Bloomberg</span><span class="mw-pill">Investing.com</span><span class="mw-pill">뉴스 검색</span><span class="mw-pill">야간선물</span>
+        <span class="mw-pill">Yahoo Finance</span><span class="mw-pill">KRX</span><span class="mw-pill">뉴스 검색</span><span class="mw-pill">야간선물</span>
       </div>
       <span class="mw-update">AI 생성: """ + GENERATED_AT + """ | 기준: """ + PREV_FULL + """</span>
     </div>
@@ -305,20 +402,20 @@ HTML = """<!DOCTYPE html>
   <div class="result-banner">
     <h3>📌 """ + d.get('banner_title','전 거래일 실제 마감 결과') + """</h3>
     <div class="result-grid">
-      <div class="result-item"><div class="result-label">코스피 종가</div><div class="result-val">""" + d.get('kospi_close','—') + """</div><div class="result-chg">""" + d.get('kospi_chg','—') + """</div></div>
-      <div class="result-item"><div class="result-label">S&amp;P 500 (""" + PREV_SHORT + """)</div><div class="result-val">""" + d.get('sp500_close','—') + """</div><div class="result-chg">""" + d.get('sp500_chg','—') + """</div></div>
-      <div class="result-item"><div class="result-label">나스닥</div><div class="result-val">""" + d.get('nasdaq_close','—') + """</div><div class="result-chg">""" + d.get('nasdaq_chg','—') + """</div></div>
-      <div class="result-item"><div class="result-label">다우존스</div><div class="result-val">""" + d.get('dow_close','—') + """</div><div class="result-chg">""" + d.get('dow_chg','—') + """</div></div>
+      <div class="result-item"><div class="result-label">코스피 종가</div><div class="result-val">""" + fmt(kospi_close) + """</div><div class="result-chg">""" + chg_display(kospi_chg_pt, kospi_chg_pct) + """</div></div>
+      <div class="result-item"><div class="result-label">S&amp;P 500 (""" + PREV_SHORT + """)</div><div class="result-val">""" + fmt(sp500_close) + """</div><div class="result-chg">""" + chg_display(sp500_chg_pt, sp500_chg_pct) + """</div></div>
+      <div class="result-item"><div class="result-label">나스닥</div><div class="result-val">""" + fmt(nasdaq_close) + """</div><div class="result-chg">""" + chg_display(nasdaq_chg_pt, nasdaq_chg_pct) + """</div></div>
+      <div class="result-item"><div class="result-label">다우존스</div><div class="result-val">""" + fmt(dow_close) + """</div><div class="result-chg">""" + chg_display(dow_chg_pt, dow_chg_pct) + """</div></div>
     </div>
   </div>
 
   <div class="news-row">""" + news_html(d.get('news',[])) + """</div>
 
   <div class="grid-4">
-    <div class="metric-card"><div class="metric-label">코스피 전일 종가 (""" + PREV_SHORT + """)</div><div class="metric-value up">""" + d.get('kospi_close','—') + """</div><div class="metric-sub up">""" + d.get('kospi_chg','—') + """</div></div>
-    <div class="metric-card"><div class="metric-label">코스닥 전일 종가</div><div class="metric-value up">""" + d.get('kosdaq_close','—') + """</div><div class="metric-sub up">""" + d.get('kosdaq_chg','—') + """</div></div>
+    <div class="metric-card"><div class="metric-label">코스피 전일 종가 (""" + PREV_SHORT + """)</div><div class="metric-value up">""" + fmt(kospi_close) + """</div><div class="metric-sub up">""" + chg_display(kospi_chg_pt, kospi_chg_pct) + """</div></div>
+    <div class="metric-card"><div class="metric-label">코스닥 전일 종가</div><div class="metric-value up">""" + fmt(kosdaq_close) + """</div><div class="metric-sub up">""" + chg_display(kosdaq_chg_pt, kosdaq_chg_pct) + """</div></div>
     <div class="metric-card"><div class="metric-label">오늘 시장 센티먼트</div><div class="metric-value warn">""" + d.get('sentiment','—') + """</div><div class="metric-sub warn">""" + d.get('sentiment_reason','') + """</div></div>
-    <div class="metric-card"><div class="metric-label">원/달러 환율 (""" + PREV_SHORT + """)</div><div class="metric-value up">""" + d.get('usd_krw','—') + """</div><div class="metric-sub up">전일 확정 환율</div></div>
+    <div class="metric-card"><div class="metric-label">원/달러 환율 (""" + PREV_SHORT + """)</div><div class="metric-value up">""" + (f"{fmt(usd_krw, 0)}원" if usd_krw else "—") + """</div><div class="metric-sub up">Yahoo Finance 실측</div></div>
   </div>
 
   <div class="grid-2">
@@ -378,7 +475,7 @@ HTML = """<!DOCTYPE html>
   <div class="grid-2">
     <div class="card">
       <div class="card-title">🌍 전 거래일 미국 증시 &amp; 주요 지표 (""" + PREV_SHORT + """)</div>
-      <div class="futures-grid">""" + us_market_html(d.get('us_market',[])) + """</div>
+      <div class="futures-grid">""" + us_market_html(us_market) + """</div>
     </div>
     <div class="card">
       <div class="card-title">📅 이번 주 주요 경제 일정</div>
@@ -395,11 +492,11 @@ HTML = """<!DOCTYPE html>
       <div class="card-title">🧠 AI 종합 분석</div>
       <div class="analysis-text">""" + d.get('analysis','분석 데이터를 불러오는 중 오류가 발생했습니다.') + """</div>
       <div class="tags">""" + tags_html(d.get('tags',[])) + """</div>
-      <div class="notice">⚠️ 본 분석은 """ + PREV_FULL + """ 확정 종가 기준으로 생성된 참고용 예상이며, 실제 투자 판단의 근거로 사용하지 마세요.</div>
+      <div class="notice">⚠️ 종가 데이터는 Yahoo Finance 실측값 기준이며, 분석은 AI 참고용입니다. 실제 투자 판단의 근거로 사용하지 마세요.</div>
     </div>
   </div>
 
-  <div class="footer">MIRAE ASSET Market Intelligence · 한국 주식시장 AI 대시보드 · """ + TODAY_TITLE + """ · 기준: """ + PREV_FULL + """ · 참고용</div>
+  <div class="footer">MIRAE ASSET Market Intelligence · 한국 주식시장 AI 대시보드 · """ + TODAY_TITLE + """ · 데이터: Yahoo Finance · 참고용</div>
 </div>
 
 <script>
@@ -418,7 +515,7 @@ function makeChart(id, base, high, low, color) {
     }
   });
 }
-makeChart('kospiChart',  """ + json.dumps(kb) + """, """ + json.dumps(kh) + """, """ + json.dumps(kl) + """, '#dc2626');
+makeChart('kospiChart',  """ + json.dumps(kb)  + """, """ + json.dumps(kh)  + """, """ + json.dumps(kl)  + """, '#dc2626');
 makeChart('kosdaqChart', """ + json.dumps(kdb) + """, """ + json.dumps(kdh) + """, """ + json.dumps(kdl) + """, '#2563eb');
 
 const sectors = """ + sectors_js(d.get('sectors',[])) + """;
