@@ -45,7 +45,7 @@ r1 = safe_json(call_claude(
     '{"kospi_close":"","kospi_chg":"▲ +Xp (+X%)","kosdaq_close":"","kosdaq_chg":"▲ +Xp (+X%)","usd_krw":"","sp500_close":"","sp500_chg":"▲ +Xp (+X%)","nasdaq_close":"","nasdaq_chg":"","dow_close":"","dow_chg":"","wti":"","us10y":"","kospi_kpi":"","kospi_chg_pct":"","kosdaq_kpi":"","banner_title":"전 거래일(' + PREV_SHORT + ') 실제 마감 결과 — 코스피 X% · S&P500 X주 연속 랠리"}'
 ))
 print("  코스피: " + r1.get('kospi_close','—'))
-time.sleep(30)
+time.sleep(65)
 
 # ── 2차: 뉴스 + 일정 + 미국증시 ──
 print("📰 [2/3] 뉴스·일정 수집 중...")
@@ -55,7 +55,7 @@ r2 = safe_json(call_claude(
     '"us_market":[{"name":"S&P 500","val":"","chg":"","cls":"up"},{"name":"나스닥","val":"","chg":"","cls":"up"},{"name":"다우존스","val":"","chg":"","cls":"up"},{"name":"필라델피아 반도체","val":"","chg":"","cls":"up"},{"name":"WTI 유가","val":"","chg":"","cls":"down"},{"name":"미 10년물 금리","val":"","chg":"","cls":"neutral"},{"name":"원/달러 (예상)","val":"","chg":"","cls":"up"},{"name":"코스피200 야간선물","val":"","chg":"","cls":"neutral"}],'
     '"schedule":[{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"high"},{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"med"},{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"high"}]}'
 ))
-time.sleep(30)
+time.sleep(65)
 
 # ── 3차: 분석 + 업종 + 확률 ──
 print("🧠 [3/3] AI 분석 생성 중...")
