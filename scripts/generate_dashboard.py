@@ -142,7 +142,7 @@ time.sleep(65)
 # ── 3단계: AI 분석 + 업종 + 확률 ──
 print("🧠 [3/3] AI 분석 생성 중...")
 r3 = safe_json(call_claude(
-    "오늘 " + TODAY_YMD + ", 코스피=" + str(kospi_close) + "(" + str(kospi_chg_pct) + "%), S&P500=" + str(sp500_close) + "\n"
+    "오늘 " + TODAY_YMD + ", 코스피=" + (fmt(kospi_close) if kospi_close else "8000") + "(" + (f"{kospi_chg_pct:+.2f}%" if kospi_chg_pct else "+0.00%") + "), S&P500=" + (fmt(sp500_close) if sp500_close else "5000") + "\n"
     "전일 확정 데이터 기반으로 오늘 한국 증시 전망을 JSON만 반환:\n"
     '{"sentiment":"중립~소폭 강세","sentiment_reason":"전망 근거 한줄",'
     '"kospi_up":58,"kospi_neutral":16,"kosdaq_up":63,"kosdaq_neutral":15,'
