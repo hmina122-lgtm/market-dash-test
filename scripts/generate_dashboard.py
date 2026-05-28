@@ -70,8 +70,8 @@ for key, symbol in tickers.items():
         tk   = yf.Ticker(symbol)
         hist = tk.history(period="5d")
         if len(hist) >= 2:
-            mkt[key + "_close"] = round(hist["Close"].iloc[-1], 2)
-            mkt[key + "_prev"]  = round(hist["Close"].iloc[-2], 2)
+            mkt[key + "_close"] = round(hist["Close"].iloc[-2], 2)
+            mkt[key + "_prev"]  = round(hist["Close"].iloc[-3], 2)
         elif len(hist) == 1:
             mkt[key + "_close"] = round(hist["Close"].iloc[-1], 2)
             mkt[key + "_prev"]  = None
