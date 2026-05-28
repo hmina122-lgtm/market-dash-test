@@ -5,17 +5,13 @@ from datetime import datetime, timezone, timedelta
 KST = timezone(timedelta(hours=9))
 now = datetime.now(KST)
 DAYS_KO = ['월','화','수','목','금','토','일']
-TODAY_FULL = now.strftime("%-m월 %-d일") + " (" + DAYS_KO[now.weekday()] + ")"
-TODAY_YMD  = now.strftime("%Y-%m-%d")
 TODAY_TITLE = now.strftime("%Y년 %-m월 %-d일") + " (" + DAYS_KO[now.weekday()] + ")"
+TODAY_YMD   = now.strftime("%Y-%m-%d")
 GENERATED_AT = now.strftime("%Y년 %-m월 %-d일 %H:%M KST")
 
 def get_prev_trading_day(d):
     wd = d.weekday()
-    if wd == 0:   delta = 3
-    elif wd == 6: delta = 2
-    elif wd == 5: delta = 1
-    else:         delta = 1
+    delta = 3 if wd==0 else (2 if wd==6 else (1 if wd==5 else 1))
     return d - timedelta(days=delta)
 
 prev_day   = get_prev_trading_day(now)
@@ -42,43 +38,53 @@ def safe_json(text):
         except: pass
     return {}
 
-# ── 1차 호출: 시장 데이터 + 뉴스 ──
-print("📡 [1/2] 전일(" + PREV_SHORT + ") 데이터 수집 중...")
-prompt1 = (
-    "오늘은 " + TODAY_YMD + ", 오전 8시(KST)입니다.\n"
-    "전 거래일(" + PREV_FULL + ") 확정 종가를 웹검색으로 수집해 JSON으로만 반환하세요.\n"
-    "마크다운 없이 JSON만 출력:\n"
-    '{"kospi_close":"7,847.71","kospi_chg":"▲ +32.12p (+0.41%)","kosdaq_close":"856.82","kosdaq_chg":"▲ +3.21p (+0.38%)","usd_krw":"1,380원","sp500_close":"7,473.47","sp500_chg":"▲ +27.75p (+0.37%)","nasdaq_close":"26,343.97","nasdaq_chg":"▲ +50.87p (+0.19%)","dow_close":"50,579.70","dow_chg":"▲ +294.04p (+0.58%) 사상 최고","banner_title":"전 거래일(' + PREV_SHORT + ') 실제 마감 결과 — 코스피 X% · S&P500 X주 연속 랠리","sentiment":"중립~소폭 강세","sentiment_reason":"전망 근거 한줄","kospi_kpi":"7,847","kospi_chg_pct":"+0.41%","kosdaq_kpi":"856","news":[{"type":"bull","tag":"🇺🇸 미국 증시 (' + PREV_SHORT + ')","title":"헤드라인","desc":"2-3문장"},{"type":"warn","tag":"📅 이번주 핵심 이벤트","title":"헤드라인","desc":"2-3문장"},{"type":"neutral","tag":"⚠️ 주요 리스크","title":"헤드라인","desc":"2-3문장"}],"kospi_up":58,"kospi_neutral":16,"kosdaq_up":63,"kosdaq_neutral":15,"kospi_badge":"핵심키워드","kosdaq_badge":"핵심키워드","kospi_bear":"7,720~7,820","kospi_bear_prob":30,"kospi_base":"7,850~7,980","kospi_base_prob":52,"kospi_bull":"7,980~8,100","kospi_bull_prob":18,"kosdaq_bear":"1,090~1,115","kosdaq_bear_prob":25,"kosdaq_base":"1,125~1,165","kosdaq_base_prob":55,"kosdaq_bull":"1,165~1,200","kosdaq_bull_prob":20,"kospi_base_price":7847,"kosdaq_base_price":856,"us_market":[{"name":"S&P 500","val":"7,473.47","chg":"+0.37% · 8주 연속↑","cls":"up"},{"name":"나스닥","val":"26,343.97","chg":"+0.19%","cls":"up"},{"name":"다우존스","val":"50,579.70","chg":"+0.58% 사상 최고치","cls":"up"},{"name":"필라델피아 반도체","val":"강세","chg":"반도체 업종↑","cls":"up"},{"name":"WTI 유가","val":"$72.5","chg":"이란 협상 기대","cls":"down"},{"name":"미 10년물 금리","val":"4.35%","chg":"안정 유지","cls":"neutral"},{"name":"원/달러 (예상)","val":"1,380원","chg":"원화 강세 지속","cls":"up"},{"name":"코스피200 야간선물","val":"315.2 (-0.3%)","chg":"차익 실현 반영","cls":"neutral"}],"schedule":[{"date":"' + TODAY_FULL + '","today":true,"title":"이벤트명","desc":"설명","imp":"high"},{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"med"}],"sectors":[{"name":"반도체","chg":1.5,"note":"AI Capex 사이클"},{"name":"2차전지","chg":0.8,"note":"순환매"},{"name":"바이오·제약","chg":0.5,"note":"수급 개선"},{"name":"항공·여행","chg":0.3,"note":"유가 안정"},{"name":"금융","chg":-0.2,"note":"금리 부담"},{"name":"건설·부동산","chg":-0.5,"note":"금리 부담"},{"name":"유틸리티","chg":-0.8,"note":"LNG 가격"}],"analysis":"오늘 장세 종합 분석 2-3문단 HTML strong 태그 사용","tags":[{"type":"bull","text":"긍정키워드"},{"type":"warn","text":"주의키워드"},{"type":"bear","text":"리스크"},{"type":"neutral","text":"중립"},{"type":"purple","text":"주요이벤트"}]}'
-)
+# ── 1차: 시장 지표 ──
+print("📡 [1/3] 시장 지표 수집 중...")
+r1 = safe_json(call_claude(
+    "오늘 " + TODAY_YMD + ", 전 거래일(" + PREV_FULL + ") 확정 종가를 웹검색으로 수집해 JSON만 반환:\n"
+    '{"kospi_close":"","kospi_chg":"▲ +Xp (+X%)","kosdaq_close":"","kosdaq_chg":"▲ +Xp (+X%)","usd_krw":"","sp500_close":"","sp500_chg":"▲ +Xp (+X%)","nasdaq_close":"","nasdaq_chg":"","dow_close":"","dow_chg":"","wti":"","us10y":"","kospi_kpi":"","kospi_chg_pct":"","kosdaq_kpi":"","banner_title":"전 거래일(' + PREV_SHORT + ') 실제 마감 결과 — 코스피 X% · S&P500 X주 연속 랠리"}'
+))
+print("  코스피: " + r1.get('kospi_close','—'))
+time.sleep(30)
 
-raw1 = call_claude(prompt1)
-d = safe_json(raw1)
-print("  코스피: " + d.get('kospi_close','—'))
+# ── 2차: 뉴스 + 일정 + 미국증시 ──
+print("📰 [2/3] 뉴스·일정 수집 중...")
+r2 = safe_json(call_claude(
+    "오늘 " + TODAY_YMD + ", 한국증시 관련 최신 뉴스와 이번주 경제일정을 웹검색으로 수집해 JSON만 반환:\n"
+    '{"news":[{"type":"bull","tag":"🇺🇸 미국 증시 (' + PREV_SHORT + ')","title":"헤드라인","desc":"2-3문장 요약"},{"type":"warn","tag":"📅 이번주 핵심 이벤트","title":"헤드라인","desc":"2-3문장 요약"},{"type":"neutral","tag":"⚠️ 주요 리스크","title":"헤드라인","desc":"2-3문장 요약"}],'
+    '"us_market":[{"name":"S&P 500","val":"","chg":"","cls":"up"},{"name":"나스닥","val":"","chg":"","cls":"up"},{"name":"다우존스","val":"","chg":"","cls":"up"},{"name":"필라델피아 반도체","val":"","chg":"","cls":"up"},{"name":"WTI 유가","val":"","chg":"","cls":"down"},{"name":"미 10년물 금리","val":"","chg":"","cls":"neutral"},{"name":"원/달러 (예상)","val":"","chg":"","cls":"up"},{"name":"코스피200 야간선물","val":"","chg":"","cls":"neutral"}],'
+    '"schedule":[{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"high"},{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"med"},{"date":"날짜","today":false,"title":"이벤트명","desc":"설명","imp":"high"}]}'
+))
+time.sleep(30)
 
-time.sleep(65)
+# ── 3차: 분석 + 업종 + 확률 ──
+print("🧠 [3/3] AI 분석 생성 중...")
+r3 = safe_json(call_claude(
+    "오늘 " + TODAY_YMD + ", 코스피=" + str(r1.get('kospi_close','')) + ", S&P500=" + str(r1.get('sp500_close','')) + "\n"
+    "전일 데이터 기반으로 오늘 한국 증시 전망을 JSON만 반환:\n"
+    '{"sentiment":"중립~소폭 강세","sentiment_reason":"전망 근거 한줄","kospi_up":58,"kospi_neutral":16,"kosdaq_up":63,"kosdaq_neutral":15,"kospi_badge":"핵심키워드","kosdaq_badge":"핵심키워드",'
+    '"kospi_bear":"범위","kospi_bear_prob":30,"kospi_base":"범위","kospi_base_prob":52,"kospi_bull":"범위","kospi_bull_prob":18,'
+    '"kosdaq_bear":"범위","kosdaq_bear_prob":25,"kosdaq_base":"범위","kosdaq_base_prob":55,"kosdaq_bull":"범위","kosdaq_bull_prob":20,'
+    '"kospi_base_price":7847,"kosdaq_base_price":856,'
+    '"sectors":[{"name":"반도체","chg":1.5,"note":"이유"},{"name":"2차전지","chg":0.8,"note":"이유"},{"name":"바이오·제약","chg":0.5,"note":"이유"},{"name":"항공·여행","chg":0.3,"note":"이유"},{"name":"금융","chg":-0.2,"note":"이유"},{"name":"건설·부동산","chg":-0.5,"note":"이유"},{"name":"유틸리티","chg":-0.8,"note":"이유"}],'
+    '"analysis":"오늘 장세 종합 분석 2-3문단 HTML strong 태그 사용",'
+    '"tags":[{"type":"bull","text":"키워드"},{"type":"bull","text":"키워드"},{"type":"warn","text":"키워드"},{"type":"bear","text":"키워드"},{"type":"neutral","text":"키워드"},{"type":"purple","text":"키워드"}]}'
+))
+print("  센티먼트: " + r3.get('sentiment','—'))
 
-# ── 2차 호출: 분석 보완 ──
-print("🧠 [2/2] AI 분석 보완 중...")
-prompt2 = (
-    "오늘은 " + TODAY_YMD + " 오전 8시(KST), 전일 코스피=" + str(d.get('kospi_close','')) + ", S&P500=" + str(d.get('sp500_close','')) + "\n"
-    "아래 항목들을 보완해서 JSON으로만 반환하세요:\n"
-    '{"analysis":"오늘(' + TODAY_FULL + ') 장세 종합 분석 2-3문단, HTML <strong> 태그 사용, 전일 확정 데이터 기반","tags":[{"type":"bull","text":"긍정키워드1"},{"type":"bull","text":"긍정키워드2"},{"type":"warn","text":"주의키워드"},{"type":"bear","text":"리스크"},{"type":"neutral","text":"중립"},{"type":"purple","text":"주요이벤트"}],"sectors":[{"name":"반도체","chg":1.5,"note":"이유"},{"name":"2차전지","chg":0.8,"note":"이유"},{"name":"바이오·제약","chg":0.5,"note":"이유"},{"name":"항공·여행","chg":0.3,"note":"이유"},{"name":"금융","chg":-0.2,"note":"이유"},{"name":"건설·부동산","chg":-0.5,"note":"이유"},{"name":"유틸리티","chg":-0.8,"note":"이유"}]}'
-)
-raw2 = call_claude(prompt2)
-d2 = safe_json(raw2)
-if d2.get('analysis'): d['analysis'] = d2['analysis']
-if d2.get('tags'):     d['tags']     = d2['tags']
-if d2.get('sectors'):  d['sectors']  = d2['sectors']
-print("  완료!")
+# ── 데이터 합치기 ──
+d = {}
+d.update(r1)
+d.update(r2)
+d.update(r3)
 
-# ── 헬퍼 함수 ──
+# ── 헬퍼 ──
 def news_html(lst):
     r = ""
     for n in (lst or [])[:3]:
         t = n.get("type","neutral")
         cls = "bull" if t=="bull" else ("warn" if t=="warn" else "")
-        r += ('<div class="news-item ' + cls + '">'
-              '<div class="news-tag">' + n.get("tag","") + '</div>'
+        r += ('<div class="news-item ' + cls + '"><div class="news-tag">' + n.get("tag","") + '</div>'
               '<div class="news-title">' + n.get("title","") + '</div>'
               '<div class="news-desc">' + n.get("desc","") + '</div></div>')
     return r
@@ -86,8 +92,7 @@ def news_html(lst):
 def us_market_html(lst):
     r = ""
     for f in (lst or []):
-        r += ('<div class="futures-item">'
-              '<div class="futures-name">' + f.get("name","") + '</div>'
+        r += ('<div class="futures-item"><div class="futures-name">' + f.get("name","") + '</div>'
               '<div class="futures-val ' + f.get("cls","") + '">' + f.get("val","—") + '</div>'
               '<div class="futures-chg ' + f.get("cls","") + '">' + f.get("chg","") + '</div></div>')
     return r
@@ -97,51 +102,39 @@ def schedule_html(lst):
     for s in (lst or [])[:5]:
         ic = "sch-high" if s.get("imp")=="high" else "sch-med"
         it = "주요" if s.get("imp")=="high" else "중요"
-        date_str = s.get("date","")
-        today_str = "<br>오늘" if s.get("today") else ""
-        r += ('<div class="schedule-row">'
-              '<span class="sch-date">' + date_str + today_str + '</span>'
-              '<div class="sch-content">'
-              '<div class="sch-title">' + s.get("title","") + ' <span class="sch-badge ' + ic + '">' + it + '</span></div>'
-              '<div class="sch-desc">' + s.get("desc","") + '</div>'
-              '</div></div>')
+        td = "<br>오늘" if s.get("today") else ""
+        r += ('<div class="schedule-row"><span class="sch-date">' + s.get("date","") + td + '</span>'
+              '<div class="sch-content"><div class="sch-title">' + s.get("title","") + ' <span class="sch-badge ' + ic + '">' + it + '</span></div>'
+              '<div class="sch-desc">' + s.get("desc","") + '</div></div></div>')
     return r
 
-def sectors_js(lst):
-    if not lst: return "[]"
-    return json.dumps([{"name":s.get("name",""),"chg":s.get("chg",0),"note":s.get("note","")} for s in lst], ensure_ascii=False)
-
 def tags_html(lst):
-    return "".join(
-        '<span class="tag tag-' + t.get("type","neutral") + '">' + t.get("text","") + '</span>'
-        for t in (lst or [])
-    )
+    return "".join('<span class="tag tag-' + t.get("type","neutral") + '">' + t.get("text","") + '</span>' for t in (lst or []))
 
-def gen_chart_data(base, bear_str, bull_str):
-    nb = re.findall(r'[\d,]+\.?\d*', (bull_str or "").replace(',',''))
-    nd = re.findall(r'[\d,]+\.?\d*', (bear_str or "").replace(',',''))
-    bh = float(nb[-1]) if nb else base * 1.012
-    bl = float(nd[0])  if nd else base * 0.988
+def sectors_js(lst):
+    return json.dumps([{"name":s.get("name",""),"chg":s.get("chg",0),"note":s.get("note","")} for s in (lst or [])], ensure_ascii=False)
+
+def gen_chart(base, bear_str, bull_str):
+    nb = re.findall(r'[\d]+\.?\d*', (bull_str or "").replace(',',''))
+    nd = re.findall(r'[\d]+\.?\d*', (bear_str or "").replace(',',''))
+    bh = float(nb[-1]) if nb else base*1.012
+    bl = float(nd[0])  if nd else base*0.988
     n = 13
-    hi = [round(base + (bh - base) * (i/(n-1)), 2) for i in range(n)]
-    lo = [round(base + (bl - base) * (i/(n-1)), 2) for i in range(n)]
+    hi = [round(base+(bh-base)*(i/(n-1)),2) for i in range(n)]
+    lo = [round(base+(bl-base)*(i/(n-1)),2) for i in range(n)]
     ba = [(h+l)/2 for h,l in zip(hi,lo)]
     return ba, hi, lo
 
-kb, kh, kl   = gen_chart_data(d.get('kospi_base_price',7847),  d.get('kospi_bear',''),  d.get('kospi_bull',''))
-kdb, kdh, kdl = gen_chart_data(d.get('kosdaq_base_price',856), d.get('kosdaq_bear',''), d.get('kosdaq_bull',''))
+kb,  kh,  kl  = gen_chart(d.get('kospi_base_price',7847),  d.get('kospi_bear',''),  d.get('kospi_bull',''))
+kdb, kdh, kdl = gen_chart(d.get('kosdaq_base_price',856), d.get('kosdaq_bear',''), d.get('kosdaq_bull',''))
 
-k_up  = d.get('kospi_up',  58)
-k_n   = d.get('kospi_neutral', 16)
-kd_up = d.get('kosdaq_up', 63)
-kd_n  = d.get('kosdaq_neutral', 15)
+k_up  = d.get('kospi_up',58);  k_n  = d.get('kospi_neutral',16)
+kd_up = d.get('kosdaq_up',63); kd_n = d.get('kosdaq_neutral',15)
 
-# ── HTML 생성 (원본 디자인 100% 동일) ──
 HTML = """<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>한국 주식시장 AI 대시보드 | """ + TODAY_TITLE + """</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
@@ -260,12 +253,7 @@ HTML = """<!DOCTYPE html>
   .notice { font-size: 11px; color: #999; background: #f9fafb; border-radius: 8px; padding: 9px 12px; margin-top: 12px; border: 1px solid #e5e7eb; }
   .chart-wrap { position: relative; height: 165px; }
   .footer { text-align: center; margin-top: 20px; font-size: 11px; color: #bbb; padding-bottom: 16px; }
-  @media(max-width:768px) {
-    .grid-4 { grid-template-columns: repeat(2,1fr); }
-    .grid-2 { grid-template-columns: 1fr; }
-    .news-row { grid-template-columns: 1fr; }
-    .result-grid { grid-template-columns: repeat(2,1fr); }
-  }
+  @media(max-width:768px) { .grid-4{grid-template-columns:repeat(2,1fr)} .grid-2{grid-template-columns:1fr} .news-row{grid-template-columns:1fr} .result-grid{grid-template-columns:repeat(2,1fr)} }
 </style>
 </head>
 <body>
@@ -296,20 +284,20 @@ HTML = """<!DOCTYPE html>
           <span class="mw-s-val">""" + d.get('sentiment','—') + """</span>
         </div>
         <div class="mw-kpi-row">
-          <div class="mw-kpi"><div class="mw-kpi-val">""" + d.get('kospi_kpi','—') + """</div><div class="mw-kpi-label">코스피 전일(""" + PREV_SHORT + """)</div></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">""" + d.get('kospi_kpi', d.get('kospi_close','—')) + """</div><div class="mw-kpi-label">코스피 전일(""" + PREV_SHORT + """)</div></div>
           <div class="mw-kpi-div"></div>
           <div class="mw-kpi"><div class="mw-kpi-val">""" + d.get('kospi_chg_pct','—') + """</div><div class="mw-kpi-label">전일 등락</div></div>
           <div class="mw-kpi-div"></div>
-          <div class="mw-kpi"><div class="mw-kpi-val">""" + d.get('kosdaq_kpi','—') + """</div><div class="mw-kpi-label">코스닥 전일</div></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">""" + d.get('kosdaq_kpi', d.get('kosdaq_close','—')) + """</div><div class="mw-kpi-label">코스닥 전일</div></div>
         </div>
       </div>
     </div>
     <div class="mw-bottom-bar">
       <div class="mw-sources">
         <span class="mw-src-label">데이터 소스</span>
-        <span class="mw-pill">KRX</span><span class="mw-pill">Bloomberg</span><span class="mw-pill">Reuters</span><span class="mw-pill">뉴스 검색</span><span class="mw-pill">야간선물</span>
+        <span class="mw-pill">KRX</span><span class="mw-pill">Bloomberg</span><span class="mw-pill">Investing.com</span><span class="mw-pill">뉴스 검색</span><span class="mw-pill">야간선물</span>
       </div>
-      <span class="mw-update">AI 생성: """ + GENERATED_AT + """ | 기준: """ + PREV_FULL + """ 확정종가</span>
+      <span class="mw-update">AI 생성: """ + GENERATED_AT + """ | 기준: """ + PREV_FULL + """</span>
     </div>
     <div class="mw-orange-line"></div>
   </div>
@@ -416,13 +404,6 @@ HTML = """<!DOCTYPE html>
 
 <script>
 const labels = ['9:00','9:30','10:00','10:30','11:00','11:30','12:00','13:00','13:30','14:00','14:30','15:00','15:30'];
-const kospiBase  = """ + json.dumps(kb) + """;
-const kospiHigh  = """ + json.dumps(kh) + """;
-const kospiLow   = """ + json.dumps(kl) + """;
-const kosdaqBase = """ + json.dumps(kdb) + """;
-const kosdaqHigh = """ + json.dumps(kdh) + """;
-const kosdaqLow  = """ + json.dumps(kdl) + """;
-
 function makeChart(id, base, high, low, color) {
   new Chart(document.getElementById(id).getContext('2d'), {
     type:'line',
@@ -431,18 +412,14 @@ function makeChart(id, base, high, low, color) {
       {label:'기본',data:base,borderColor:color,borderWidth:2.5,fill:false,tension:0.4,pointRadius:3,pointBackgroundColor:color},
       {label:'하단',data:low,borderColor:color,borderWidth:1,borderDash:[4,3],fill:'-1',backgroundColor:color+'14',tension:0.4,pointRadius:0}
     ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
+    options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toLocaleString()}}},
-      scales:{
-        x:{grid:{display:false},ticks:{font:{size:10},maxRotation:0,maxTicksLimit:7}},
-        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},callback:v=>v.toLocaleString()}}
-      }
+      scales:{x:{grid:{display:false},ticks:{font:{size:10},maxRotation:0,maxTicksLimit:7}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},callback:v=>v.toLocaleString()}}}
     }
   });
 }
-makeChart('kospiChart',  kospiBase,  kospiHigh,  kospiLow,  '#dc2626');
-makeChart('kosdaqChart', kosdaqBase, kosdaqHigh, kosdaqLow, '#2563eb');
+makeChart('kospiChart',  """ + json.dumps(kb) + """, """ + json.dumps(kh) + """, """ + json.dumps(kl) + """, '#dc2626');
+makeChart('kosdaqChart', """ + json.dumps(kdb) + """, """ + json.dumps(kdh) + """, """ + json.dumps(kdl) + """, '#2563eb');
 
 const sectors = """ + sectors_js(d.get('sectors',[])) + """;
 const maxAbs = Math.max(...sectors.map(s=>Math.abs(s.chg)));
@@ -450,11 +427,7 @@ document.getElementById('sectorList').innerHTML = sectors.map(s=>{
   const pct = Math.abs(s.chg)/maxAbs*100;
   const col = s.chg>0?'#dc2626':'#2563eb';
   const cls = s.chg>0?'up':'down';
-  return `<div class="sector-row">
-    <span class="sector-name">${s.name}</span>
-    <div class="sector-bar-bg"><div class="sector-bar" style="width:${pct.toFixed(0)}%;background:${col};"></div></div>
-    <span class="sector-pct ${cls}">${s.chg>0?'+':''}${s.chg.toFixed(1)}%</span>
-  </div>`;
+  return `<div class="sector-row"><span class="sector-name">${s.name}</span><div class="sector-bar-bg"><div class="sector-bar" style="width:${pct.toFixed(0)}%;background:${col};"></div></div><span class="sector-pct ${cls}">${s.chg>0?'+':''}${s.chg.toFixed(1)}%</span></div>`;
 }).join('');
 </script>
 </body>
