@@ -1,21 +1,271 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="refresh" content="5">
-<title>대시보드 준비 중...</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한국 주식시장 AI 대시보드 | 2026년 5월 28일 (목)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-  body { font-family: 'Malgun Gothic', sans-serif; background: #043B72; color: #fff;
-         display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; flex-direction: column; gap: 16px; }
-  .logo { background: #E8380D; border-radius: 4px; padding: 6px 14px; font-size: 14px; font-weight: 600; letter-spacing: 0.05em; }
-  h1 { font-size: 20px; font-weight: 500; }
-  p  { font-size: 13px; color: rgba(255,255,255,0.6); }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;background:#f0f3f8;color:#1a1a2e;font-size:14px}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.mw-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.mw-logo-box{background:#E8380D;border-radius:4px;padding:5px 12px}
+.mw-logo-text{font-size:13px;font-weight:500;color:#fff;letter-spacing:.02em}
+.mw-logo-sub{font-size:11px;color:#666;margin-left:8px}
+.mw-date-area{display:flex;align-items:center;gap:8px}
+.mw-date{font-size:12px;color:#666}
+.mw-live{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#E8380D;background:#fdf0ed;border:.5px solid #f5b8a8;border-radius:99px;padding:2px 10px}
+.mw-main{border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);margin-bottom:16px}
+.mw-header-bar{background:#043B72;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.mw-title-en{font-size:10px;font-weight:500;letter-spacing:.14em;color:rgba(255,255,255,.5);text-transform:uppercase;margin-bottom:5px}
+.mw-title-ko{font-size:22px;font-weight:500;color:#fff;letter-spacing:-.02em}
+.mw-title-ko em{color:#F58220;font-style:normal}
+.mw-title-desc{font-size:12px;color:rgba(255,255,255,.5);margin-top:4px}
+.mw-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.mw-sentiment-chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.2);border-radius:99px;padding:5px 14px}
+.mw-s-dot{width:7px;height:7px;border-radius:50%;background:#4ade80}
+.mw-s-label{font-size:11px;color:rgba(255,255,255,.65)}
+.mw-s-val{font-size:12px;font-weight:600;color:#fff}
+.mw-kpi-row{display:flex;align-items:center;gap:12px}
+.mw-kpi{text-align:right}
+.mw-kpi-val{font-size:16px;font-weight:600;color:#fca5a5}
+.mw-kpi-label{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px}
+.mw-kpi-div{width:.5px;height:32px;background:rgba(255,255,255,.2)}
+.mw-bottom-bar{background:#f8f9fc;padding:9px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid #e5e7eb}
+.mw-sources{display:flex;align-items:center;gap:6px}
+.mw-src-label{font-size:11px;color:#888}
+.mw-pill{font-size:10px;padding:2px 8px;border-radius:99px;border:.5px solid #d1d5db;color:#666;background:#fff}
+.mw-update{font-size:11px;color:#888}
+.mw-orange-line{height:3px;background:#F58220}
+.result-banner{background:linear-gradient(135deg,#043B72,#1d5fa8);border-radius:12px;padding:14px 20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(4,59,114,.2)}
+.result-banner h3{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);margin-bottom:10px}
+.result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.result-item{text-align:center}
+.result-label{font-size:10px;color:rgba(255,255,255,.6);margin-bottom:3px}
+.result-val{font-size:17px;font-weight:700;color:#fca5a5}
+.result-chg{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px}
+.news-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.news-item{background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:3px solid #2563eb}
+.news-item.bull{border-left-color:#dc2626}.news-item.warn{border-left-color:#d97706}
+.news-tag{font-size:10px;font-weight:700;color:#2563eb;margin-bottom:4px}
+.news-item.bull .news-tag{color:#dc2626}.news-item.warn .news-tag{color:#d97706}
+.news-title{font-size:12px;font-weight:600;margin-bottom:3px;line-height:1.5}
+.news-desc{font-size:11px;color:#666;line-height:1.5}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.metric-card{background:#fff;border-radius:10px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.metric-label{font-size:11px;color:#888;margin-bottom:4px}
+.metric-value{font-size:22px;font-weight:700}
+.metric-sub{font-size:12px;margin-top:3px}
+.card{background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.card-title{font-size:13px;font-weight:600;color:#444;margin-bottom:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.up{color:#dc2626}.down{color:#2563eb}.neutral{color:#888}.warnc{color:#d97706}
+.badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
+.badge-warn{background:#fef3c7;color:#92400e}.badge-green{background:#d1fae5;color:#065f46}
+.gauge-wrap{margin-bottom:10px}
+.gauge-bar-outer{width:100%;height:28px;border-radius:14px;overflow:hidden;display:flex;position:relative;background:#e5e7eb;margin-bottom:5px}
+.gauge-up-fill{height:100%;display:flex;align-items:center;justify-content:center}
+.gauge-down-fill{height:100%;flex:1;display:flex;align-items:center;justify-content:center}
+.gauge-bar-label{font-size:11px;font-weight:700;color:#fff}
+.gauge-center-line{position:absolute;left:50%;top:0;bottom:0;width:2px;background:rgba(255,255,255,.5)}
+.gauge-labels{display:flex;justify-content:space-between;font-size:11px;font-weight:600}
+.gauge-label-up{color:#dc2626}.gauge-label-center{color:#999}.gauge-label-down{color:#2563eb}
+.prob-divider{text-align:center;font-size:10px;color:#999;margin:6px 0}
+.prob-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.prob-row:last-child{margin-bottom:0}
+.prob-name{font-size:11px;font-weight:600;width:56px;flex-shrink:0}
+.prob-bar-bg{flex:1;height:18px;border-radius:9px;overflow:hidden;background:#e5e7eb}
+.prob-bar-inner{height:100%;border-radius:9px;display:flex;align-items:center;justify-content:flex-end;padding-right:7px}
+.prob-pct{font-size:13px;font-weight:700;width:34px;text-align:right;flex-shrink:0}
+.pred-band{display:flex;gap:6px;margin-bottom:10px}
+.pred-item{flex:1;padding:7px 8px;border-radius:8px;text-align:center}
+.pred-bear{background:#eff6ff}.pred-base{background:#f9fafb}.pred-bull{background:#fef2f2}
+.pred-label{font-size:10px;color:#888;margin-bottom:3px}
+.pred-range{font-size:12px;font-weight:700}
+.pred-prob{font-size:10px;color:#888;margin-top:2px}
+.futures-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.futures-item{padding:8px 10px;background:#f9fafb;border-radius:8px}
+.futures-name{font-size:10px;color:#888;margin-bottom:2px}
+.futures-val{font-size:14px;font-weight:700}
+.futures-chg{font-size:11px}
+.sector-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0f0f0}
+.sector-row:last-child{border-bottom:none}
+.sector-name{width:82px;font-size:11px;flex-shrink:0;font-weight:500}
+.sector-bar-bg{flex:1;height:5px;background:#f0f0f0;border-radius:3px;overflow:hidden}
+.sector-bar{height:100%;border-radius:3px}
+.sector-pct{width:44px;text-align:right;font-size:11px;font-weight:700;flex-shrink:0}
+.schedule-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid #f0f0f0}
+.schedule-row:last-child{border-bottom:none}
+.sch-date{font-size:11px;font-weight:700;width:36px;flex-shrink:0;color:#043B72}
+.sch-content{flex:1}
+.sch-title{font-size:12px;font-weight:600}
+.sch-desc{font-size:11px;color:#666;margin-top:2px}
+.sch-badge{font-size:10px;padding:1px 7px;border-radius:99px;font-weight:600;margin-left:5px}
+.sch-high{background:#fee2e2;color:#b91c1c}.sch-med{background:#fef3c7;color:#92400e}
+.analysis-text{font-size:13px;line-height:1.8;color:#333}
+.tags{margin-top:10px}
+.tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:99px;margin:2px 3px 2px 0}
+.tag-bull{background:#fee2e2;color:#b91c1c}.tag-bear{background:#dbeafe;color:#1d4ed8}
+.tag-neutral{background:#f3f4f6;color:#555}.tag-warn{background:#fef3c7;color:#92400e}
+.tag-purple{background:#ede9fe;color:#5b21b6}
+.notice{font-size:11px;color:#999;background:#f9fafb;border-radius:8px;padding:9px 12px;margin-top:12px;border:1px solid #e5e7eb}
+.chart-wrap{position:relative;height:165px}
+.footer{text-align:center;margin-top:20px;font-size:11px;color:#bbb;padding-bottom:16px}
+@media(max-width:768px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}.news-row{grid-template-columns:1fr}.result-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-  <div class="logo">MIRAE ASSET</div>
-  <h1>대시보드 첫 생성 중...</h1>
-  <p>Actions 탭에서 워크플로우를 실행하면 이 페이지가 대시보드로 교체됩니다.</p>
-  <p>이 페이지는 5초마다 자동 새로고침됩니다.</p>
+<div class="container">
+  <div class="mw-top">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="mw-logo-box"><span class="mw-logo-text">MIRAE ASSET</span></div>
+      <span class="mw-logo-sub">Market Intelligence</span>
+    </div>
+    <div class="mw-date-area">
+      <span class="mw-date">2026년 5월 28일 (목)</span>
+      <span class="mw-live">● AI 생성</span>
+    </div>
+  </div>
+  <div class="mw-main">
+    <div class="mw-header-bar">
+      <div>
+        <div class="mw-title-en">Korea Equity Market AI Dashboard</div>
+        <div class="mw-title-ko">한국 주식시장 <em>AI</em> 대시보드</div>
+        <div class="mw-title-desc">전일 미국 증시 · 야간선물 · 환율 · 주요 경제 뉴스 종합 분석</div>
+      </div>
+      <div class="mw-header-right">
+        <div class="mw-sentiment-chip">
+          <div class="mw-s-dot"></div>
+          <span class="mw-s-label">오늘 센티먼트</span>
+          <span class="mw-s-val">강세우량주쏠림</span>
+        </div>
+        <div class="mw-kpi-row">
+          <div class="mw-kpi"><div class="mw-kpi-val">—</div><div class="mw-kpi-label">코스피 전일(—)</div></div>
+          <div class="mw-kpi-div"></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">—</div><div class="mw-kpi-label">전일 등락</div></div>
+          <div class="mw-kpi-div"></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">—</div><div class="mw-kpi-label">코스닥 전일</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="mw-bottom-bar">
+      <div class="mw-sources">
+        <span class="mw-src-label">데이터 소스</span>
+        <span class="mw-pill">KRX</span><span class="mw-pill">Bloomberg</span><span class="mw-pill">Reuters</span><span class="mw-pill">뉴스검색</span>
+      </div>
+      <span class="mw-update">AI 생성: 2026년 05월 28일 14:57 KST</span>
+    </div>
+    <div class="mw-orange-line"></div>
+  </div>
+
+  <div class="result-banner">
+    <h3>📌 전 거래일 실제 마감 결과</h3>
+    <div class="result-grid">
+      <div class="result-item"><div class="result-label">코스피 종가</div><div class="result-val">—</div><div class="result-chg">—</div></div>
+      <div class="result-item"><div class="result-label">S&amp;P 500</div><div class="result-val">—</div><div class="result-chg">—</div></div>
+      <div class="result-item"><div class="result-label">나스닥</div><div class="result-val">—</div><div class="result-chg">—</div></div>
+      <div class="result-item"><div class="result-label">다우존스</div><div class="result-val">—</div><div class="result-chg">—</div></div>
+    </div>
+  </div>
+
+  <div class="news-row"></div>
+
+  <div class="grid-4">
+    <div class="metric-card"><div class="metric-label">코스피 전일 종가</div><div class="metric-value up">—</div><div class="metric-sub up">—</div></div>
+    <div class="metric-card"><div class="metric-label">코스닥 전일 종가</div><div class="metric-value up">—</div><div class="metric-sub up">—</div></div>
+    <div class="metric-card"><div class="metric-label">오늘 시장 센티먼트</div><div class="metric-value warnc">강세우량주쏠림</div><div class="metric-sub warnc">반도체 대형주 중심 강세지속, 외국인 차익실현에도 개인기관 매수 반등</div></div>
+    <div class="metric-card"><div class="metric-label">원/달러 환율</div><div class="metric-value up">—</div><div class="metric-sub up">오늘 예상</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📊 코스피 상승/하락 확률 <span class="badge badge-warn">AI반도체슈퍼사이클</span></div>
+      <div class="gauge-wrap">
+        <div class="gauge-bar-outer">
+          <div class="gauge-up-fill" style="width:52%;background:linear-gradient(90deg,#fca5a5,#dc2626);"><span class="gauge-bar-label">52%</span></div>
+          <div class="gauge-down-fill" style="background:linear-gradient(90deg,#93c5fd,#2563eb);"><span class="gauge-bar-label">48%</span></div>
+          <div class="gauge-center-line"></div>
+        </div>
+        <div class="gauge-labels"><span class="gauge-label-up">▲ 상승 52%</span><span class="gauge-label-center">50%</span><span class="gauge-label-down">하락 48% ▼</span></div>
+      </div>
+      <div class="prob-divider">— 시나리오별 확률 —</div>
+      <div class="prob-row"><span class="prob-name up">추가 상승</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:52%;background:linear-gradient(90deg,#ef4444,#dc2626);"><span style="font-size:10px;font-weight:700;color:#fff;">52%</span></div></div><span class="prob-pct up">52%</span></div><div class="prob-row"><span class="prob-name neutral">횡보</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:18%;background:#9ca3af;"><span style="font-size:10px;font-weight:700;color:#fff;">18%</span></div></div><span class="prob-pct neutral">18%</span></div><div class="prob-row"><span class="prob-name down">하락</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:30%;background:linear-gradient(90deg,#3b82f6,#2563eb);"><span style="font-size:10px;font-weight:700;color:#fff;">30%</span></div></div><span class="prob-pct down">30%</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 코스닥 상승/하락 확률 <span class="badge badge-green">광통신이차전지순환</span></div>
+      <div class="gauge-wrap">
+        <div class="gauge-bar-outer">
+          <div class="gauge-up-fill" style="width:48%;background:linear-gradient(90deg,#fca5a5,#dc2626);"><span class="gauge-bar-label">48%</span></div>
+          <div class="gauge-down-fill" style="background:linear-gradient(90deg,#93c5fd,#2563eb);"><span class="gauge-bar-label">52%</span></div>
+          <div class="gauge-center-line"></div>
+        </div>
+        <div class="gauge-labels"><span class="gauge-label-up">▲ 상승 48%</span><span class="gauge-label-center">50%</span><span class="gauge-label-down">하락 52% ▼</span></div>
+      </div>
+      <div class="prob-divider">— 시나리오별 확률 —</div>
+      <div class="prob-row"><span class="prob-name up">추가 상승</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:48%;background:linear-gradient(90deg,#ef4444,#dc2626);"><span style="font-size:10px;font-weight:700;color:#fff;">48%</span></div></div><span class="prob-pct up">48%</span></div><div class="prob-row"><span class="prob-name neutral">횡보</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:16%;background:#9ca3af;"><span style="font-size:10px;font-weight:700;color:#fff;">16%</span></div></div><span class="prob-pct neutral">16%</span></div><div class="prob-row"><span class="prob-name down">하락</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:36%;background:linear-gradient(90deg,#3b82f6,#2563eb);"><span style="font-size:10px;font-weight:700;color:#fff;">36%</span></div></div><span class="prob-pct down">36%</span></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📈 코스피 장중 예상 <span class="badge badge-warn">AI반도체슈퍼사이클</span></div>
+      <div class="pred-band"><div class="pred-item pred-bear"><div class="pred-label">약세</div><div class="pred-range down">7600-7900</div><div class="pred-prob">25%</div></div><div class="pred-item pred-base"><div class="pred-label">기본</div><div class="pred-range">8000-8500</div><div class="pred-prob">55%</div></div><div class="pred-item pred-bull"><div class="pred-label">강세</div><div class="pred-range up">8600-9200</div><div class="pred-prob">20%</div></div></div>
+      <div class="chart-wrap"><canvas id="kospiChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📈 코스닥 장중 예상 <span class="badge badge-green">광통신이차전지순환</span></div>
+      <div class="pred-band"><div class="pred-item pred-bear"><div class="pred-label">약세</div><div class="pred-range down">1050-1080</div><div class="pred-prob">30%</div></div><div class="pred-item pred-base"><div class="pred-label">기본</div><div class="pred-range">1100-1200</div><div class="pred-prob">50%</div></div><div class="pred-item pred-bull"><div class="pred-label">강세</div><div class="pred-range up">1250-1400</div><div class="pred-prob">20%</div></div></div>
+      <div class="chart-wrap"><canvas id="kosdaqChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🌍 전 거래일 미국 증시 &amp; 주요 지표</div>
+      <div class="futures-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 이번 주 주요 경제 일정</div>
+      
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🏦 오늘 업종 예상</div>
+      <div class="sector-row"><span class="sector-name">반도체</span><div class="sector-bar-bg"><div class="sector-bar" style="width:18%;background:#dc2626;"></div></div><span class="sector-pct up">+2.1%</span></div><div class="sector-row"><span class="sector-name">2차전지</span><div class="sector-bar-bg"><div class="sector-bar" style="width:100%;background:#dc2626;"></div></div><span class="sector-pct up">+11.5%</span></div><div class="sector-row"><span class="sector-name">전력기기</span><div class="sector-bar-bg"><div class="sector-bar" style="width:7%;background:#dc2626;"></div></div><span class="sector-pct up">+0.8%</span></div><div class="sector-row"><span class="sector-name">조선방산</span><div class="sector-bar-bg"><div class="sector-bar" style="width:4%;background:#2563eb;"></div></div><span class="sector-pct down">-0.5%</span></div><div class="sector-row"><span class="sector-name">증권</span><div class="sector-bar-bg"><div class="sector-bar" style="width:10%;background:#2563eb;"></div></div><span class="sector-pct down">-1.2%</span></div><div class="sector-row"><span class="sector-name">항공여행</span><div class="sector-bar-bg"><div class="sector-bar" style="width:3%;background:#dc2626;"></div></div><span class="sector-pct up">+0.3%</span></div><div class="sector-row"><span class="sector-name">금융</span><div class="sector-bar-bg"><div class="sector-bar" style="width:3%;background:#2563eb;"></div></div><span class="sector-pct down">-0.4%</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🧠 AI 종합 분석</div>
+      <div class="analysis-text">2026년 5월 28일 한국 증시는 코스피 8200선, 코스닥 1100선에서 호흡 고르기 중입니다. 코스피는 이틀 연속 사상최고치를 경신한 후 외국인 1.6조원 순매도에도 개인·기관 매수로 8226선 보합 마감했습니다. 삼성전자와 SK하이닉스 중심의 AI 반도체 슈퍼사이클이 지수를 견인하며, 2026년 코스피 영업이익 전망치가 800조원대로 상향되고 있습니다. 특히 두 기업만으로 600조원의 영업이익이 예상되며, 5월 첫 10일간 반도체 수출이 149.8% 급증하는 등 펀더멘털 개선이 뚜렷합니다.
+
+한편 S&P500은 7519(5/26 종가)로 Goldman Sachs가 연말 목표를 8000으로 상향하며 낙관론이 우세합니다. 1분기 미국 기업 이익이 28% 급증하며 AI 인프라 투자가 실적으로 전환되고 있습니다. 다만 단기적으로는 반도체 쏠림 심화(코스피 상위4개 종목이 49% 비중), 미·이란 협상 불확실성, 한은 하반기 금리인상 시그널 등이 변수입니다. 5월 중순 실적시즌 마무리 후 순환매로 2차전지·전력기기·원전 등으로 자금 분산이 예상되며, 코스피는 실적 장세 지속 속에서도 박스권 등락을 보일 전망입니다.</div>
+      <div class="tags"><span class="tag tag-bull">AI반도체실적폭발</span><span class="tag tag-bull">수출149%급증</span><span class="tag tag-warn">대형주쏠림49%</span><span class="tag tag-warn">외국인차익실현</span><span class="tag tag-bear">금리인상시그널</span><span class="tag tag-bear">중동리스크잔존</span></div>
+      <div class="notice">⚠️ 본 분석은 공개된 시장 데이터 및 뉴스를 바탕으로 한 참고용 예상이며, 실제 투자 판단의 근거로 사용하지 마세요.</div>
+    </div>
+  </div>
+
+  <div class="footer">MIRAE ASSET Market Intelligence · 한국 주식시장 AI 대시보드 · 2026년 5월 28일 (목) · 참고용</div>
+</div>
+<script>
+const L=['9:00','9:30','10:00','10:30','11:00','11:30','12:00','13:00','13:30','14:00','14:30','15:00','15:30'];
+function makeChart(id,base,high,low,color){
+  new Chart(document.getElementById(id).getContext('2d'),{
+    type:'line',
+    data:{labels:L,datasets:[
+      {label:'상단',data:high,borderColor:color,borderWidth:1,borderDash:[4,3],fill:false,tension:.4,pointRadius:0},
+      {label:'기본',data:base,borderColor:color,borderWidth:2.5,fill:false,tension:.4,pointRadius:3,pointBackgroundColor:color},
+      {label:'하단',data:low,borderColor:color,borderWidth:1,borderDash:[4,3],fill:'-1',backgroundColor:color+'14',tension:.4,pointRadius:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:10},maxRotation:0,maxTicksLimit:7}},
+               y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:10},callback:v=>v.toLocaleString()}}}
+    }
+  });
+}
+makeChart('kospiChart',[8228.0, 8242.335, 8256.665, 8271.0, 8285.335, 8299.665, 8314.0, 8328.335, 8342.665, 8357.0, 8371.335, 8385.665, 8400.0],[8228.0, 8309.0, 8390.0, 8471.0, 8552.0, 8633.0, 8714.0, 8795.0, 8876.0, 8957.0, 9038.0, 9119.0, 9200.0],[8228.0, 8175.67, 8123.33, 8071.0, 8018.67, 7966.33, 7914.0, 7861.67, 7809.33, 7757.0, 7704.67, 7652.33, 7600.0],'#dc2626');
+makeChart('kosdaqChart',[1112.0, 1121.415, 1130.835, 1140.25, 1149.665, 1159.085, 1168.5, 1177.915, 1187.335, 1196.75, 1206.165, 1215.585, 1225.0],[1112.0, 1136.0, 1160.0, 1184.0, 1208.0, 1232.0, 1256.0, 1280.0, 1304.0, 1328.0, 1352.0, 1376.0, 1400.0],[1112.0, 1106.83, 1101.67, 1096.5, 1091.33, 1086.17, 1081.0, 1075.83, 1070.67, 1065.5, 1060.33, 1055.17, 1050.0],'#2563eb');
+</script>
 </body>
 </html>
