@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>한국 주식시장 AI 대시보드 | 2026년 5월 28일 (목)</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
@@ -121,12 +120,7 @@
   .notice { font-size: 11px; color: #999; background: #f9fafb; border-radius: 8px; padding: 9px 12px; margin-top: 12px; border: 1px solid #e5e7eb; }
   .chart-wrap { position: relative; height: 165px; }
   .footer { text-align: center; margin-top: 20px; font-size: 11px; color: #bbb; padding-bottom: 16px; }
-  @media(max-width:768px) {
-    .grid-4 { grid-template-columns: repeat(2,1fr); }
-    .grid-2 { grid-template-columns: 1fr; }
-    .news-row { grid-template-columns: 1fr; }
-    .result-grid { grid-template-columns: repeat(2,1fr); }
-  }
+  @media(max-width:768px) { .grid-4{grid-template-columns:repeat(2,1fr)} .grid-2{grid-template-columns:1fr} .news-row{grid-template-columns:1fr} .result-grid{grid-template-columns:repeat(2,1fr)} }
 </style>
 </head>
 <body>
@@ -154,49 +148,49 @@
         <div class="mw-sentiment-chip">
           <div class="mw-s-dot"></div>
           <span class="mw-s-label">오늘 센티먼트</span>
-          <span class="mw-s-val">강세</span>
+          <span class="mw-s-val">중립~소폭 강세</span>
         </div>
         <div class="mw-kpi-row">
-          <div class="mw-kpi"><div class="mw-kpi-val">—</div><div class="mw-kpi-label">코스피 전일(5/27 수)</div></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">8,229.00</div><div class="mw-kpi-label">코스피 전일(5/27 수)</div></div>
           <div class="mw-kpi-div"></div>
-          <div class="mw-kpi"><div class="mw-kpi-val">—</div><div class="mw-kpi-label">전일 등락</div></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">2.25%</div><div class="mw-kpi-label">전일 등락</div></div>
           <div class="mw-kpi-div"></div>
-          <div class="mw-kpi"><div class="mw-kpi-val">—</div><div class="mw-kpi-label">코스닥 전일</div></div>
+          <div class="mw-kpi"><div class="mw-kpi-val">1,163.75</div><div class="mw-kpi-label">코스닥 전일</div></div>
         </div>
       </div>
     </div>
     <div class="mw-bottom-bar">
       <div class="mw-sources">
         <span class="mw-src-label">데이터 소스</span>
-        <span class="mw-pill">KRX</span><span class="mw-pill">Bloomberg</span><span class="mw-pill">Reuters</span><span class="mw-pill">뉴스 검색</span><span class="mw-pill">야간선물</span>
+        <span class="mw-pill">KRX</span><span class="mw-pill">Bloomberg</span><span class="mw-pill">Investing.com</span><span class="mw-pill">뉴스 검색</span><span class="mw-pill">야간선물</span>
       </div>
-      <span class="mw-update">AI 생성: 2026년 5월 28일 15:43 KST | 기준: 2026년 5월 27일 (수) 확정종가</span>
+      <span class="mw-update">AI 생성: 2026년 5월 28일 16:00 KST | 기준: 2026년 5월 27일 (수)</span>
     </div>
     <div class="mw-orange-line"></div>
   </div>
 
   <div class="result-banner">
-    <h3>📌 전 거래일(5/27 수) 실제 마감 결과</h3>
+    <h3>📌 전 거래일(5/27 수) 실제 마감 결과 — 코스피 2.25% · S&P500 0.02% 소폭 상승</h3>
     <div class="result-grid">
-      <div class="result-item"><div class="result-label">코스피 종가</div><div class="result-val">8,447.69</div><div class="result-chg">▲ +400.18p (+4.96%)</div></div>
-      <div class="result-item"><div class="result-label">S&amp;P 500 (5/27 수)</div><div class="result-val">7,520.36</div><div class="result-chg">▲ +0.02%</div></div>
-      <div class="result-item"><div class="result-label">나스닥</div><div class="result-val">26,674.74</div><div class="result-chg">▲ +0.07%</div></div>
-      <div class="result-item"><div class="result-label">다우존스</div><div class="result-val">50,644.28</div><div class="result-chg">▲ +0.36%</div></div>
+      <div class="result-item"><div class="result-label">코스피 종가</div><div class="result-val">8,229.00</div><div class="result-chg">▲ +181.49p (+2.25%)</div></div>
+      <div class="result-item"><div class="result-label">S&amp;P 500 (5/27 수)</div><div class="result-val">7,520.36</div><div class="result-chg">▲ +1.24p (+0.02%)</div></div>
+      <div class="result-item"><div class="result-label">나스닥</div><div class="result-val">26,674.74</div><div class="result-chg">▲ +18.55p (+0.07%)</div></div>
+      <div class="result-item"><div class="result-label">다우존스</div><div class="result-val">50,644.28</div><div class="result-chg">▲ +182.60p (+0.36%)</div></div>
     </div>
   </div>
 
-  <div class="news-row"></div>
+  <div class="news-row"><div class="news-item bull"><div class="news-tag">🇺🇸 미국 증시 (5/27 수)</div><div class="news-title">다우·S&P500 소폭 상승, 반도체 랠리 약세 제한</div><div class="news-desc">다우존스는 182.60p(+0.36%) 상승한 5만644.28로, S&P500은 1.24p(+0.02%) 상승한 7520.36으로 마감했습니다. 나스닥은 18.55p(+0.07%) 상승하며 보합권에 머물렀으나, 반도체주 약세(ASML -2.09%, 인텔 -1.42%)가 기술주 상승을 제한했습니다.</div></div><div class="news-item bull"><div class="news-tag">📈 한국증시 강세</div><div class="news-title">코스피 7000선 근처에서 강세 지속</div><div class="news-desc">5월 6일 이후 반도체 수혜와 실적 랠리로 코스피는 7000선 돌파에 성공했으며, 삼성전자와 SK하이닉스가 지수 상승을 주도하고 있습니다. 한국 증시는 펀더멘털 장세로 평가받고 있습니다.</div></div><div class="news-item warn"><div class="news-tag">⚠️ 이란-미국 분쟁 위험</div><div class="news-title">중동 정세 불안이 유가 변동성 지속</div><div class="news-desc">미·이란 협상이 5월 말까지 계속될 것으로 예상되며, 호르무즈 해협 정상화는 6월 이후로 연장될 가능성이 높습니다. 유가 변동성으로 인한 글로벌 인플레이션 우려가 지속되고 있습니다.</div></div></div>
 
   <div class="grid-4">
-    <div class="metric-card"><div class="metric-label">코스피 전일 종가 (5/27 수)</div><div class="metric-value up">8,447.69</div><div class="metric-sub up">▲ +400.18p (+4.96%)</div></div>
-    <div class="metric-card"><div class="metric-label">코스닥 전일 종가</div><div class="metric-value up">1,163.75</div><div class="metric-sub up">▼ -9.10p (-0.75%)</div></div>
-    <div class="metric-card"><div class="metric-label">오늘 시장 센티먼트</div><div class="metric-value warn">강세</div><div class="metric-sub warn">코스피 사상 최고치 경신, 반도체주 랠리, 미·이란 협상 기대감</div></div>
-    <div class="metric-card"><div class="metric-label">원/달러 환율 (5/27 수)</div><div class="metric-value up">1,400원</div><div class="metric-sub up">전일 확정 환율</div></div>
+    <div class="metric-card"><div class="metric-label">코스피 전일 종가 (5/27 수)</div><div class="metric-value up">8,229.00</div><div class="metric-sub up">▲ +181.49p (+2.25%)</div></div>
+    <div class="metric-card"><div class="metric-label">코스닥 전일 종가</div><div class="metric-value up">1,163.75</div><div class="metric-sub up">▼ -8.75p (-0.75%)</div></div>
+    <div class="metric-card"><div class="metric-label">오늘 시장 센티먼트</div><div class="metric-value warn">중립~소폭 강세</div><div class="metric-sub warn">S&P500 소폭 상승 (+0.02%) 영향으로 미국 시장 안정세 지속, 한국은 반도체 호실적 기대 vs 지정학적 리스크 균형</div></div>
+    <div class="metric-card"><div class="metric-label">원/달러 환율 (5/27 수)</div><div class="metric-value up">1,500</div><div class="metric-sub up">전일 확정 환율</div></div>
   </div>
 
   <div class="grid-2">
     <div class="card">
-      <div class="card-title">📊 코스피 상승/하락 확률 <span class="badge badge-warn"></span></div>
+      <div class="card-title">📊 코스피 상승/하락 확률 <span class="badge badge-warn">반도체 강세</span></div>
       <div class="gauge-wrap">
         <div class="gauge-bar-outer">
           <div class="gauge-up-fill" style="width:58%;background:linear-gradient(90deg,#fca5a5,#dc2626);"><span class="gauge-bar-label">58%</span></div>
@@ -211,7 +205,7 @@
       <div class="prob-row"><span class="prob-name down">차익 하락</span><div class="prob-bar-bg"><div class="prob-bar-inner" style="width:26%;background:linear-gradient(90deg,#3b82f6,#2563eb);"><span style="font-size:10px;font-weight:700;color:#fff;">26%</span></div></div><span class="prob-pct down">26%</span></div>
     </div>
     <div class="card">
-      <div class="card-title">📊 코스닥 상승/하락 확률 <span class="badge badge-green"></span></div>
+      <div class="card-title">📊 코스닥 상승/하락 확률 <span class="badge badge-green">기술주 주도</span></div>
       <div class="gauge-wrap">
         <div class="gauge-bar-outer">
           <div class="gauge-up-fill" style="width:63%;background:linear-gradient(90deg,#fca5a5,#dc2626);"><span class="gauge-bar-label">63%</span></div>
@@ -229,20 +223,20 @@
 
   <div class="grid-2">
     <div class="card">
-      <div class="card-title">📈 코스피 장중 예상 <span class="badge badge-warn"></span></div>
+      <div class="card-title">📈 코스피 장중 예상 <span class="badge badge-warn">반도체 강세</span></div>
       <div class="pred-band">
-        <div class="pred-item pred-bear"><div class="pred-label">약세</div><div class="pred-range down">—</div><div class="pred-prob">—%</div></div>
-        <div class="pred-item pred-base"><div class="pred-label">기본</div><div class="pred-range">—</div><div class="pred-prob">—%</div></div>
-        <div class="pred-item pred-bull"><div class="pred-label">강세</div><div class="pred-range up">—</div><div class="pred-prob">—%</div></div>
+        <div class="pred-item pred-bear"><div class="pred-label">약세</div><div class="pred-range down">7,900~8,100</div><div class="pred-prob">25%</div></div>
+        <div class="pred-item pred-base"><div class="pred-label">기본</div><div class="pred-range">8,100~8,350</div><div class="pred-prob">58%</div></div>
+        <div class="pred-item pred-bull"><div class="pred-label">강세</div><div class="pred-range up">8,350~8,500</div><div class="pred-prob">17%</div></div>
       </div>
       <div class="chart-wrap"><canvas id="kospiChart"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-title">📈 코스닥 장중 예상 <span class="badge badge-green"></span></div>
+      <div class="card-title">📈 코스닥 장중 예상 <span class="badge badge-green">기술주 주도</span></div>
       <div class="pred-band">
-        <div class="pred-item pred-bear"><div class="pred-label">약세</div><div class="pred-range down">—</div><div class="pred-prob">—%</div></div>
-        <div class="pred-item pred-base"><div class="pred-label">기본</div><div class="pred-range">—</div><div class="pred-prob">—%</div></div>
-        <div class="pred-item pred-bull"><div class="pred-label">강세</div><div class="pred-range up">—</div><div class="pred-prob">—%</div></div>
+        <div class="pred-item pred-bear"><div class="pred-label">약세</div><div class="pred-range down">720~780</div><div class="pred-prob">22%</div></div>
+        <div class="pred-item pred-base"><div class="pred-label">기본</div><div class="pred-range">780~850</div><div class="pred-prob">60%</div></div>
+        <div class="pred-item pred-bull"><div class="pred-label">강세</div><div class="pred-range up">850~920</div><div class="pred-prob">18%</div></div>
       </div>
       <div class="chart-wrap"><canvas id="kosdaqChart"></canvas></div>
     </div>
@@ -251,11 +245,11 @@
   <div class="grid-2">
     <div class="card">
       <div class="card-title">🌍 전 거래일 미국 증시 &amp; 주요 지표 (5/27 수)</div>
-      <div class="futures-grid"></div>
+      <div class="futures-grid"><div class="futures-item"><div class="futures-name">S&P 500</div><div class="futures-val neutral">7520.36</div><div class="futures-chg neutral">+0.02%</div></div><div class="futures-item"><div class="futures-name">나스닥</div><div class="futures-val neutral">26674.74</div><div class="futures-chg neutral">+0.07%</div></div><div class="futures-item"><div class="futures-name">다우존스</div><div class="futures-val up">50644.28</div><div class="futures-chg up">+0.36%</div></div><div class="futures-item"><div class="futures-name">필라델피아 반도체</div><div class="futures-val down">소폭하락</div><div class="futures-chg down">-</div></div><div class="futures-item"><div class="futures-name">WTI 유가</div><div class="futures-val down">~93-94달러</div><div class="futures-chg down">-2.81%</div></div><div class="futures-item"><div class="futures-name">미 10년물 금리</div><div class="futures-val down">4.495%</div><div class="futures-chg down">-6.8bp</div></div><div class="futures-item"><div class="futures-name">원/달러 (예상)</div><div class="futures-val up">~1490원</div><div class="futures-chg up">+</div></div><div class="futures-item"><div class="futures-name">코스피200 야간선물</div><div class="futures-val down">1186</div><div class="futures-chg down">-2.33%</div></div></div>
     </div>
     <div class="card">
       <div class="card-title">📅 이번 주 주요 경제 일정</div>
-      
+      <div class="schedule-row"><span class="sch-date">2026-05-28<br>오늘</span><div class="sch-content"><div class="sch-title">한국 금융통화위원회(금통위) <span class="sch-badge sch-high">주요</span></div><div class="sch-desc">한국은행이 기준금리 결정과 경제전망을 발표합니다. 5월 인상 시그널 가능성이 제기되었으며, 하반기 1회 인상이 예상되고 있습니다.</div></div></div><div class="schedule-row"><span class="sch-date">2026-05-29</span><div class="sch-content"><div class="sch-title">미국 임상종양학회(ASCO 2026) <span class="sch-badge sch-med">중요</span></div><div class="sch-desc">5월 29일부터 6월 2일까지 개최되며, 바이오/제약 기업 실적에 긍정적 영향을 미칠 가능성이 있습니다.</div></div></div><div class="schedule-row"><span class="sch-date">2026-06-01</span><div class="sch-content"><div class="sch-title">미국 5월 고용통계 발표 <span class="sch-badge sch-high">주요</span></div><div class="sch-desc">4월 고용 데이터가 변동성을 보인 가운데, 5월 고용통계가 연준의 통화정책 방향성을 결정할 핵심 지표가 될 것으로 예상됩니다.</div></div></div>
     </div>
   </div>
 
@@ -266,8 +260,8 @@
     </div>
     <div class="card">
       <div class="card-title">🧠 AI 종합 분석</div>
-      <div class="analysis-text">분석 데이터를 불러오는 중 오류가 발생했습니다.</div>
-      <div class="tags"></div>
+      <div class="analysis-text"><strong>코스피는 반도체 섹터 주도로 사상 최고치(8,229) 근처에서 보합세 전망</strong>. <strong>삼성전자·SK하이닉스 레버리지 ETF 상장으로 유동성 확대 기대</strong>가 긍정적으로 작용하며, 미국-이란 휴전 협상 진전으로 지정학적 리스크 완화 추세. 다만 단기 급등에 따른 밸류에이션 부담과 원화약세 지속에 따른 외국인 자금 이탈 우려가 상승폭을 제한할 것으로 예상.</div>
+      <div class="tags"><span class="tag tag-bull">반도체 호실적</span><span class="tag tag-bull">유동성 확대</span><span class="tag tag-bull">미국시장 안정</span><span class="tag tag-warn">단기 부담 심화</span><span class="tag tag-warn">외국인 매도</span><span class="tag tag-bear">원화약세</span><span class="tag tag-neutral">지정학적 리스크</span><span class="tag tag-purple">금융통화위원회(28일)</span></div>
       <div class="notice">⚠️ 본 분석은 2026년 5월 27일 (수) 확정 종가 기준으로 생성된 참고용 예상이며, 실제 투자 판단의 근거로 사용하지 마세요.</div>
     </div>
   </div>
@@ -277,13 +271,6 @@
 
 <script>
 const labels = ['9:00','9:30','10:00','10:30','11:00','11:30','12:00','13:00','13:30','14:00','14:30','15:00','15:30'];
-const kospiBase  = [7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0, 7847.0];
-const kospiHigh  = [7847.0, 7854.85, 7862.69, 7870.54, 7878.39, 7886.23, 7894.08, 7901.93, 7909.78, 7917.62, 7925.47, 7933.32, 7941.16];
-const kospiLow   = [7847.0, 7839.15, 7831.31, 7823.46, 7815.61, 7807.77, 7799.92, 7792.07, 7784.22, 7776.38, 7768.53, 7760.68, 7752.84];
-const kosdaqBase = [856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0, 856.0];
-const kosdaqHigh = [856.0, 856.86, 857.71, 858.57, 859.42, 860.28, 861.14, 861.99, 862.85, 863.7, 864.56, 865.42, 866.27];
-const kosdaqLow  = [856.0, 855.14, 854.29, 853.43, 852.58, 851.72, 850.86, 850.01, 849.15, 848.3, 847.44, 846.58, 845.73];
-
 function makeChart(id, base, high, low, color) {
   new Chart(document.getElementById(id).getContext('2d'), {
     type:'line',
@@ -292,30 +279,22 @@ function makeChart(id, base, high, low, color) {
       {label:'기본',data:base,borderColor:color,borderWidth:2.5,fill:false,tension:0.4,pointRadius:3,pointBackgroundColor:color},
       {label:'하단',data:low,borderColor:color,borderWidth:1,borderDash:[4,3],fill:'-1',backgroundColor:color+'14',tension:0.4,pointRadius:0}
     ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
+    options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toLocaleString()}}},
-      scales:{
-        x:{grid:{display:false},ticks:{font:{size:10},maxRotation:0,maxTicksLimit:7}},
-        y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},callback:v=>v.toLocaleString()}}
-      }
+      scales:{x:{grid:{display:false},ticks:{font:{size:10},maxRotation:0,maxTicksLimit:7}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},callback:v=>v.toLocaleString()}}}
     }
   });
 }
-makeChart('kospiChart',  kospiBase,  kospiHigh,  kospiLow,  '#dc2626');
-makeChart('kosdaqChart', kosdaqBase, kosdaqHigh, kosdaqLow, '#2563eb');
+makeChart('kospiChart',  [8229.0, 8226.58, 8224.17, 8221.75, 8219.33, 8216.92, 8214.5, 8212.08, 8209.67, 8207.25, 8204.83, 8202.42, 8200.0], [8229.0, 8251.58, 8274.17, 8296.75, 8319.33, 8341.92, 8364.5, 8387.08, 8409.67, 8432.25, 8454.83, 8477.42, 8500.0], [8229.0, 8201.58, 8174.17, 8146.75, 8119.33, 8091.92, 8064.5, 8037.08, 8009.67, 7982.25, 7954.83, 7927.42, 7900.0], '#dc2626');
+makeChart('kosdaqChart', [815.0, 815.415, 815.835, 816.25, 816.665, 817.085, 817.5, 817.915, 818.335, 818.75, 819.165, 819.585, 820.0], [815.0, 823.75, 832.5, 841.25, 850.0, 858.75, 867.5, 876.25, 885.0, 893.75, 902.5, 911.25, 920.0], [815.0, 807.08, 799.17, 791.25, 783.33, 775.42, 767.5, 759.58, 751.67, 743.75, 735.83, 727.92, 720.0], '#2563eb');
 
-const sectors = [];
+const sectors = [{"name": "반도체", "chg": 2.1, "note": "삼성전자·SK하이닉스 레버리지 ETF 상장으로 유동성 확대 기대"}, {"name": "2차전지", "chg": 1.2, "note": "전기차 수요 회복 및 글로벌 AI 인프라 구축 수혜"}, {"name": "바이오·제약", "chg": 0.6, "note": "의료 수요 증가 및 생명공학-AI 융합 가속화 전망"}, {"name": "항공·여행", "chg": 0.4, "note": "미국-이란 종전 기대감으로 유가 급락 시 수혜"}, {"name": "금융", "chg": -0.1, "note": "금리 인하 기대로 은행주 제한적, 상법개정안 호재 부분 상쇄"}, {"name": "건설·부동산", "chg": -0.4, "note": "고금리 환경 지속 및 내수 부진 우려"}, {"name": "유틸리티", "chg": -0.7, "note": "금리 인하 기대에도 구조적 약세 지속"}];
 const maxAbs = Math.max(...sectors.map(s=>Math.abs(s.chg)));
 document.getElementById('sectorList').innerHTML = sectors.map(s=>{
   const pct = Math.abs(s.chg)/maxAbs*100;
   const col = s.chg>0?'#dc2626':'#2563eb';
   const cls = s.chg>0?'up':'down';
-  return `<div class="sector-row">
-    <span class="sector-name">${s.name}</span>
-    <div class="sector-bar-bg"><div class="sector-bar" style="width:${pct.toFixed(0)}%;background:${col};"></div></div>
-    <span class="sector-pct ${cls}">${s.chg>0?'+':''}${s.chg.toFixed(1)}%</span>
-  </div>`;
+  return `<div class="sector-row"><span class="sector-name">${s.name}</span><div class="sector-bar-bg"><div class="sector-bar" style="width:${pct.toFixed(0)}%;background:${col};"></div></div><span class="sector-pct ${cls}">${s.chg>0?'+':''}${s.chg.toFixed(1)}%</span></div>`;
 }).join('');
 </script>
 </body>
