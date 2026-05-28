@@ -2,12 +2,11 @@ name: 📊 매일 대시보드 자동 생성
 
 on:
   schedule:
-    # 매일 오전 8시 (한국시간) = UTC 23:00 (전날)
-    - cron: '0 23 * * 0-4'   # 일~목 UTC 23:00 (월~금 KST 08:00)
-  workflow_dispatch:           # 수동 실행 버튼도 추가
+    - cron: '0 22 * * 0-4'
+  workflow_dispatch:
 
 permissions:
-  contents: write   # index.html 커밋용
+  contents: write
   pages: write
   id-token: write
 
@@ -24,7 +23,7 @@ jobs:
           python-version: '3.11'
 
       - name: 📦 패키지 설치
-        run: pip install anthropic
+        run: pip install anthropic yfinance
 
       - name: 🤖 대시보드 생성
         env:
