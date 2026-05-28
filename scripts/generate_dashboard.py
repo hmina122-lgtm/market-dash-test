@@ -7,6 +7,7 @@
 import anthropic
 import json
 import re
+import time
 from datetime import datetime, timezone, timedelta
 
 # 한국 시간
@@ -73,6 +74,7 @@ market_raw = call_claude(f"""
 }}""")
 market = safe_json(market_raw)
 print(f"  코스피: {market.get('kospi_close','—')}, S&P500: {market.get('sp500','—')}")
+time.sleep(30)  # ← 이 줄 추가
 
 # ──────────────────────────────────────────
 # 2. 뉴스 & 일정
@@ -102,6 +104,7 @@ news_raw = call_claude(f"""
   ]
 }}""")
 news = safe_json(news_raw)
+time.sleep(30)  # ← 이 줄 추가
 
 # ──────────────────────────────────────────
 # 3. 확률 분석
@@ -125,6 +128,7 @@ prob_raw = call_claude(f"""
   "kosdaq_base_price": 850
 }}""")
 prob = safe_json(prob_raw)
+time.sleep(30)  # ← 이 줄 추가
 
 # ──────────────────────────────────────────
 # 4. 섹터 & 종합 분석
@@ -150,6 +154,7 @@ analysis_raw = call_claude(f"""
   ]
 }}""")
 analysis = safe_json(analysis_raw)
+time.sleep(30)  # ← 이 줄 추가
 
 # ──────────────────────────────────────────
 # HTML 생성
