@@ -87,7 +87,7 @@ raw1 = call_claude(prompt1)
 d1 = safe_json(raw1)
 print("  코스피: " + d1.get('kospi',{}).get('close','—') + ", S&P500: " + d1.get('sp500',{}).get('close','—'))
 
-time.sleep(65)
+time.sleep(90)
 
 # ── 2차 호출: 오늘 장세 전망 분석 ──
 print("🧠 [2/2] 오늘 장세 전망 분석 중...")
