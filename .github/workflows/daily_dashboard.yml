@@ -2,8 +2,11 @@ name: 📊 매일 대시보드 자동 생성
 
 on:
   schedule:
-    - cron: '30 0 * * 0-4'
+    - cron: '50 1 * * 0-4'
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: write
